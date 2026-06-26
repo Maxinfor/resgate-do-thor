@@ -19,7 +19,6 @@ let player;
 let obstacles;
 let score = 0;
 let scoreText;
-// Mude para 'liz' se quiser trocar a personagem principal
 let personagemEscolhido = 'helo'; 
 
 function preload() {
@@ -56,7 +55,6 @@ function create() {
     this.time.addEvent({
         delay: 1200,
         callback: () => {
-            // Escolhe uma das 3 faixas: 66, 200 ou 333
             let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
             let obs = obstacles.create(xPos, -50, 'thor').setDisplaySize(50, 50);
             obs.setVelocityY(350);
@@ -70,20 +68,20 @@ function create() {
 
     // 5. Controles de Toque
     this.input.on('pointerdown', (pointer) => {
-        // Divide a tela em 3 faixas baseadas no clique
         if (pointer.x < 133) player.x = 66;
         else if (pointer.x < 266) player.x = 200;
         else player.x = 333;
     });
 
     // 6. Colisão
-    this.physics.add.overlap(player, obstacles, () => {
-        this.physics.pause(); // Para o jogo
+    this.physics.add.overlap(player, obstacles, (p, o) => {
+        this.physics.pause();
+        o.disableBody(true, true); // Faz o obstáculo desaparecer
         alert("Ops! O Thor ainda não foi alcançado! Pontuação: " + score);
-        location.reload(); // Reinicia o jogo
+        location.reload(); 
     });
 }
 
 function update() {
-    // A lógica de movimentação já está no evento 'pointerdown'
+    // Espaço reservado para atualizações constantes
 }
