@@ -21,4 +21,3 @@ function evento(tipo) {
     
     // Atualiza fala
     balao.innerText = tipo === 'chuva' ? "Helô: Protegidas da chuva!" : "Liz: Óculos salvos da poeira!";
-}
