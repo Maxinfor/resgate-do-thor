@@ -1,6 +1,6 @@
 ﻿self.addEventListener('install', (e) => {
   e.waitUntil(caches.open('thor-store').then((cache) => cache.addAll([
-    'index.html', 'style.css', 'script.js', 'Capa.jpg', 'Helo.jpg', 'Liz.jpg', 'Thor.jpg', 'latido thor.mp3'
+    'index.html', 'style.css', 'script.js', 'capa.jpg', 'helo.jpg', 'liz.jpg', 'thor.jpg', 'latido thor.mp3'
   ])));
 });
 
