@@ -22,20 +22,22 @@ let scoreText;
 let personagemEscolhido = 'helo'; 
 
 function preload() {
-    // Carregando imagens com log de erro para depuração
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
-
-    this.load.on('loaderror', (file) => {
-        console.error("Erro ao carregar: " + file.src);
-    });
 }
 
 function create() {
-    // Fundo para garantir que não fique tudo rosa ou invisível
+    // Cor de fundo do jogo
     this.cameras.main.setBackgroundColor('#2c3e50');
 
+    // Desenhar linhas divisórias de faixa
+    let graphics = this.add.graphics();
+    graphics.lineStyle(2, 0xffffff, 0.2);
+    graphics.lineBetween(133, 0, 133, 600);
+    graphics.lineBetween(266, 0, 266, 600);
+
+    // 1. Jogador
     player = this.physics.add.sprite(200, 500, personagemEscolhido).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
     
@@ -47,11 +49,10 @@ function create() {
         repeat: -1
     });
 
-    scoreText = this.add.text(20, 20, 'Score: 0', { 
-        fontSize: '32px', 
-        fill: '#ffffff' 
-    });
+    // 2. Pontuação
+    scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '32px', fill: '#ffffff' });
 
+    // 3. Obstáculos
     obstacles = this.physics.add.group();
 
     this.time.addEvent({
@@ -66,15 +67,19 @@ function create() {
         loop: true
     });
 
-    this.input.on('pointerdown', (pointer) => {
-        if (pointer.x < 133) player.x = 66;
-        else if (pointer.x < 266) player.x = 200;
-        else player.x = 333;
+    // 5. Controles de Arrastar (Drag)
+    this.input.on('pointermove', (pointer) => {
+        if (pointer.isDown) {
+            if (pointer.x < 133) player.x = 66;
+            else if (pointer.x < 266) player.x = 200;
+            else player.x = 333;
+        }
     });
 
+    // 6. Colisão
     this.physics.add.overlap(player, obstacles, () => {
         this.physics.pause();
-        alert("Fim de jogo! Pontuação: " + score);
+        alert("Fim de jogo! Pontuação final: " + score);
         location.reload();
     });
 }
