@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -9,46 +9,34 @@
 
     <div id="tela-capa">
         <h1>O Resgate do Thor</h1>
-        <img src="Imagine_1106023435937210.jpg" alt="Thor">
-        <p>Thor, nosso pequeno aventureiro, saiu para explorar e se perdeu! Helô e Liz precisam da sua ajuda para enfrentar os desafios da cidade e trazer nosso melhor amigo de <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-    <title>Resgate do Thor</title>
-</head>
-<body>
-
-    <div id="tela-capa">
-        <h1>O Resgate do Thor</h1>
-        <img src="Imagine_1106023435937210.jpg" alt="Thor">
-        <p>Thor, nosso pequeno aventureiro, saiu para explorar e se perdeu! Helô e Liz precisam da sua ajuda para enfrentar os desafios da cidade e trazer nosso melhor amigo de volta para casa. Você está pronto para essa missão?</p>
+        <img src="Thor.jpeg.jpg" alt="Thor">
+        <p>Thor se perdeu! Helô e Liz precisam da sua ajuda para trazê-lo de volta.</p>
         <button onclick="iniciarJogo()">Começar a Busca</button>
     </div>
 
     <div id="jogo-container" style="display: none;">
         <div id="topo-jogo">
             <div id="personagens">
-                <img id="helo-img" src="Imagine_1106011292605091-1.jpg" alt="Helô">
-                <img id="liz-img" src="Imagine_1106015515938002-1.jpg" alt="Liz">
+                <img id="helo-img" src="Helo.jpeg.jpg" alt="Helô">
+                <img id="liz-img" src="Liz.jpeg.jpg" alt="Liz">
             </div>
             <div id="balao" class="balao-fala">Helô: Vamos encontrar o Thor!</div>
         </div>
 
         <div id="area-jogo">
-            <img id="thor-img" src="Imagine_1106023435937210.jpg" alt="Thor">
+            <img id="thor-img" src="Thor.jpeg.jpg" alt="Thor">
         </div>
 
         <div id="energia-container"><div id="energia-bar"></div></div>
         <p>Energia: <span id="valor-energia">100</span>%</p>
 
         <div id="botoes">
-            <button onclick="evento('chuva')">Coletar Guarda-Chuva (Helô)</button>
-            <button onclick="evento('poeira')">Coletar Óculos (Liz)</button>
+            <button onclick="evento('chuva')">Coletar Guarda-Chuva</button>
+            <button onclick="evento('poeira')">Coletar Óculos</button>
         </div>
     </div>
 
-    <audio id="som-latido" src="latido.mp3"></audio>
+    <audio id="som-latido" src="latido thor.mp3"></audio>
     <script src="script.js"></script>
 </body>
 </html>
