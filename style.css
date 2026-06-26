@@ -38,6 +38,17 @@ button { padding: 15px 30px; background: #6a1b9a; color: white; border: none; bo
     0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0px); }
+    /* Efeito de balanço suave para Helô e Liz */
+@keyframes flutuar {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Aplicando a animação apenas nas fotos da Helô e Liz */
+#helo-img, #liz-img {
+    animation: flutuar 3s ease-in-out infinite;
+}
 }
 
 /* Aplicando a animação apenas nas fotos da Helô e Liz */
