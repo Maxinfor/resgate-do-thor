@@ -33,5 +33,13 @@ function create() {
 
 function update() {
     // Aqui entra a lógica dos obstáculos vindo de cima para baixo
+    this.time.addEvent({
+    delay: 1000,
+    callback: () => {
+        let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
+        let obs = this.physics.add.sprite(xPos, 0, 'obstaculo').setVelocityY(300);
+    },
+    loop: true
+});
 }
 </script>
