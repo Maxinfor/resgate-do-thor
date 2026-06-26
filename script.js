@@ -8,20 +8,21 @@ const config = {
 
 const game = new Phaser.Game(config);
 let player, obstacles, cursors;
-let personagemEscolhido = 'helo'; // Você pode mudar para 'liz' aqui
+// Troque para 'liz' se quiser que ela seja a principal
+let personagemEscolhido = 'helo'; 
 
 function preload() {
-    this.load.image('helo', 'helo.jpg.jpg');
-    this.load.image('liz', 'liz.jpg.jpg'); // Carregando a Liz
-    this.load.image('obstaculo', 'Thor.jpg.jpg');
+    this.load.image('helo', 'helo.jpg');
+    this.load.image('liz', 'liz.jpg');
+    this.load.image('thor', 'thor.jpg'); // Este é o obstáculo
 }
 
 function create() {
-    // 1. Jogador (Carrega a imagem baseada na escolha)
+    // 1. Jogador
     player = this.physics.add.sprite(200, 500, personagemEscolhido).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
     
-    // Efeito de balanço constante para o personagem não ficar estático
+    // Efeito de movimento constante (para não ficar estático)
     this.tweens.add({
         targets: player,
         y: 490, 
@@ -33,18 +34,18 @@ function create() {
     // 2. Grupo de Obstáculos
     obstacles = this.physics.add.group();
 
-    // 3. Spawner de obstáculos
+    // 3. Spawner: Thor aparece como obstáculo descendo
     this.time.addEvent({
         delay: 1200,
         callback: () => {
             let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
-            let obs = obstacles.create(xPos, -50, 'obstaculo').setDisplaySize(50, 50);
+            let obs = obstacles.create(xPos, -50, 'thor').setDisplaySize(50, 50);
             obs.setVelocityY(350); 
         },
         loop: true
     });
 
-    // 4. Controles (Clique nas faixas)
+    // 4. Controles (Clique nas 3 faixas)
     this.input.on('pointerdown', (pointer) => {
         if (pointer.x < 133) player.x = 66;
         else if (pointer.x < 266) player.x = 200;
@@ -59,5 +60,5 @@ function create() {
 }
 
 function update() {
-    // Aqui você pode adicionar lógica de pontuação conforme o tempo
+    // Espaço para lógica futura
 }
