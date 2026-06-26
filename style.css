@@ -1,58 +1,70 @@
-﻿body { font-family: sans-serif; text-align: center; background: #fce4ec; margin: 0; padding: 20px; }
-#tela-capa { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-#tela-capa img { width: 250px; border-radius: 20px; border: 5px solid #ffca28; }
-#jogo-container { background: white; padding: 20px; border-radius: 20px; }
-#personagens { display: flex; justify-content: center; gap: 20px; }
-#personagens img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #6a1b9a; }
-.balao-fala { background: #fff; border: 2px solid #6a1b9a; border-radius: 15px; padding: 10px; margin: 10px auto; width: 80%; font-style: italic; }
-#area-jogo { height: 150px; position: relative; border-bottom: 2px solid #ddd; margin: 20px 0; }
-#thor-img { width: 80px; position: absolute; left: 0; bottom: 0; transition: left 2s ease-in-out; }
-#energia-container { width: 100%; height: 20px; background: #eee; border-radius: 10px; }
-#energia-bar { height: 100%; width: 100%; background: #6a1b9a; border-radius: 10px; transition: 0.3s; }
-button { padding: 15px 30px; background: #6a1b9a; color: white; border: none; border-radius: 10px; cursor: pointer; /* Adicione isso ao seu arquivo style.css */
-
-#tela-capa img {
-    width: 250px;
-    height: 250px;
-    object-fit: cover; /* Isso faz a imagem preencher o espaço sem distorcer */
-    border-radius: 20px;
-    border: 5px solid #ffca28;
+﻿/* Configuração Geral */
+body { 
+    font-family: sans-serif; 
+    text-align: center; 
+    background: #fce4ec; 
+    margin: 0; 
+    padding: 20px; 
 }
 
-#thor-img {
-    width: 100px; /* Ajuste o tamanho do Thor conforme preferir */
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    transition: left 2s ease-in-out;
+/* Ajustes da Capa */
+#tela-capa { 
+    background: white; 
+    padding: 40px; 
+    border-radius: 20px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
 }
 
-#personagens img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover; /* Mantém o foco no rosto da Helô e da Liz */
-    border-radius: 50%;
-    border: 3px solid #6a1b9a;
-    /* Efeito de balanço suave para Helô e Liz */
-@keyframes flutuar {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-    /* Efeito de balanço suave para Helô e Liz */
+#tela-capa img { 
+    width: 250px; 
+    height: 250px; 
+    object-fit: cover; 
+    border-radius: 20px; 
+    border: 5px solid #ffca28; 
+}
+
+/* Animação de Flutuar */
 @keyframes flutuar {
     0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0px); }
 }
 
-/* Aplicando a animação apenas nas fotos da Helô e Liz */
-#helo-img, #liz-img {
-    animation: flutuar 3s ease-in-out infinite;
-}
+/* Estilo dos Personagens */
+#personagens { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    margin-bottom: 20px;
 }
 
-/* Aplicando a animação apenas nas fotos da Helô e Liz */
-#helo-img, #liz-img {
-    animation: flutuar 3s ease-in-out infinite;
+#personagens img { 
+    width: 100px; 
+    height: 100px; 
+    object-fit: cover; 
+    border-radius: 50%; 
+    border: 3px solid #6a1b9a; 
 }
+
+#helo-img, #liz-img { 
+    animation: flutuar 3s ease-in-out infinite; 
+}
+
+/* Estilo do Jogo (Phaser Canvas) */
+canvas { 
+    border: 2px solid #6a1b9a; 
+    border-radius: 10px; 
+    margin-top: 20px;
+}
+
+/* Botões */
+button { 
+    padding: 15px 30px; 
+    background: #6a1b9a; 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 16px;
+    margin-top: 20px;
 }
