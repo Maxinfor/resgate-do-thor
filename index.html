@@ -2,61 +2,28 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-    <title>Resgate do Thor</title>
-    <head>
-    <!-- ... seus links atuais ... -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resgate do Thor</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6a1b9a">
+    
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fce4ec; overflow: hidden; }
+        canvas { border: 2px solid #6a1b9a; border-radius: 10px; }
+    </style>
 </head>
 <body>
-    <!-- ... seu conteúdo ... -->
+
     <script>
+        // Registrar Service Worker para PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
     </script>
+    
     <script src="script.js"></script>
-</body>
-</head>
-<body>
-
-    <!-- Capa do jogo adicionada aqui -->
-    <div id="tela-capa">
-        <h1>O Resgate do Thor</h1>
-        <img src="Capa.jpg" alt="Capa do Jogo">
-        <p>Thor se perdeu! Helô e Liz precisam da sua ajuda para trazê-lo de volta.</p>
-        <button onclick="iniciarJogo()">Começar a Busca</button>
-    </div>
-
-    <div id="jogo-container" style="display: none;">
-        <div id="topo-jogo">
-            <div id="personagens">
-                <!-- Imagens corrigidas para Helo.jpg e Liz.jpg -->
-               <img src="Capa.jpg" alt="Capa do Jogo">
-               <img id="helo-img" src="Helo.jpg" alt="Helô">
-               <img id="liz-img" src="Liz.jpg" alt="Liz">
-               <img id="thor-img" src="Thor.jpg" alt="Thor">
-            </div>
-            <div id="balao" class="balao-fala">Helô: Vamos encontrar o Thor!</div>
-        </div>
-
-        <div id="area-jogo">
-            <!-- Imagem do Thor corrigida e sem nome/texto extra -->
-            <img id="thor-img" src="Thor.jpg" alt="Thor">
-        </div>
-
-        <div id="energia-container"><div id="energia-bar"></div></div>
-        <p>Energia: <span id="valor-energia">100</span>%</p>
-
-        <div id="botoes">
-            <button onclick="evento('chuva')">Coletar Guarda-Chuva</button>
-            <button onclick="evento('poeira')">Coletar Óculos</button>
-        </div>
-    </div>
-
-    <audio id="som-latido" src="latido thor.mp3"></audio>
-     <script src="script.js"></script>
 </body>
 </html>
