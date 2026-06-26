@@ -22,9 +22,9 @@ let scoreText;
 let personagemEscolhido = 'helo'; 
 
 function preload() {
-    this.load.image('helo', 'helo.jpg');
-    this.load.image('liz', 'liz.jpg');
-    this.load.image('thor', 'thor.jpg');
+    this.load.image('helo', 'Helo.jpg');
+    this.load.image('liz', 'Liz.jpg');
+    this.load.image('thor', 'Thor.jpg');
 }
 
 function create() {
