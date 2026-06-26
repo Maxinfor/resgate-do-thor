@@ -1,45 +1,63 @@
-<script>
 const config = {
     type: Phaser.AUTO,
-    width: 400, // Ajustado para formato de celular
+    width: 400,
     height: 600,
     physics: { default: 'arcade', arcade: { debug: false } },
     scene: { preload: preload, create: create, update: update }
 };
 
 const game = new Phaser.Game(config);
-let player, cursors;
+let player, obstacles, cursors;
+let personagemEscolhido = 'helo'; // Você pode mudar para 'liz' aqui
 
 function preload() {
-    // Carregando as imagens que você tem
     this.load.image('helo', 'helo.jpg.jpg');
-    this.load.image('obstaculo', 'Thor.jpg.jpg'); // O Thor será o obstáculo? 
+    this.load.image('liz', 'liz.jpg.jpg'); // Carregando a Liz
+    this.load.image('obstaculo', 'Thor.jpg.jpg');
 }
 
 function create() {
-    // Definindo as 3 faixas (X = 66, 200, 333)
-    player = this.physics.add.sprite(200, 500, 'helo').setDisplaySize(50, 80);
+    // 1. Jogador (Carrega a imagem baseada na escolha)
+    player = this.physics.add.sprite(200, 500, personagemEscolhido).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
-this.physics.add.overlap(player, grupoObstaculos, fimDeJogo, null, this);
-    cursors = this.input.keyboard.createCursorKeys();
+    
+    // Efeito de balanço constante para o personagem não ficar estático
+    this.tweens.add({
+        targets: player,
+        y: 490, 
+        duration: 400,
+        yoyo: true,
+        repeat: -1
+    });
 
-    // Controle de toque para celular (Subway Surfers style)
+    // 2. Grupo de Obstáculos
+    obstacles = this.physics.add.group();
+
+    // 3. Spawner de obstáculos
+    this.time.addEvent({
+        delay: 1200,
+        callback: () => {
+            let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
+            let obs = obstacles.create(xPos, -50, 'obstaculo').setDisplaySize(50, 50);
+            obs.setVelocityY(350); 
+        },
+        loop: true
+    });
+
+    // 4. Controles (Clique nas faixas)
     this.input.on('pointerdown', (pointer) => {
-        if (pointer.x < 133) player.x = 66;      // Faixa Esquerda
-        else if (pointer.x < 266) player.x = 200; // Faixa Centro
-        else player.x = 333;                     // Faixa Direita
+        if (pointer.x < 133) player.x = 66;
+        else if (pointer.x < 266) player.x = 200;
+        else player.x = 333;
+    });
+
+    // 5. Colisão
+    this.physics.add.overlap(player, obstacles, () => {
+        alert("Ops! O Thor ainda não foi alcançado!");
+        location.reload();
     });
 }
 
 function update() {
-    // Aqui entra a lógica dos obstáculos vindo de cima para baixo
-    this.time.addEvent({
-    delay: 1000,
-    callback: () => {
-        let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
-        let obs = this.physics.add.sprite(xPos, 0, 'obstaculo').setVelocityY(300);
-    },
-    loop: true
-});
+    // Aqui você pode adicionar lógica de pontuação conforme o tempo
 }
-</script>
