@@ -1,21 +1,37 @@
-﻿let energia = 100;
+<script>
+const config = {
+    type: Phaser.AUTO,
+    width: 400, // Ajustado para formato de celular
+    height: 600,
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: { preload: preload, create: create, update: update }
+};
 
-function iniciarJogo() {
-    document.getElementById("som-latido").play();
-    document.getElementById("tela-capa").style.display = "none";
-    document.getElementById("jogo-container").style.display = "block";
+const game = new Phaser.Game(config);
+let player, cursors;
+
+function preload() {
+    // Carregando as imagens que você tem
+    this.load.image('helo', 'helo.jpg.jpg');
+    this.load.image('obstaculo', 'Thor.jpg.jpg'); // O Thor será o obstáculo? 
 }
 
-function evento(tipo) {
-    let thor = document.getElementById("thor-img");
-    let balao = document.getElementById("balao");
-    
-    thor.style.left = "70%";
-    setTimeout(() => { thor.style.left = "0%"; }, 2000);
+function create() {
+    // Definindo as 3 faixas (X = 66, 200, 333)
+    player = this.physics.add.sprite(200, 500, 'helo').setDisplaySize(50, 80);
+    player.setCollideWorldBounds(true);
 
-    energia -= 10;
-    document.getElementById("valor-energia").innerText = energia;
-    document.getElementById("energia-bar").style.width = energia + "%";
-    
-    balao.innerText = tipo === 'chuva' ? "Helô: Protegidas da chuva!" : "Liz: Óculos salvos da poeira!";
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // Controle de toque para celular (Subway Surfers style)
+    this.input.on('pointerdown', (pointer) => {
+        if (pointer.x < 133) player.x = 66;      // Faixa Esquerda
+        else if (pointer.x < 266) player.x = 200; // Faixa Centro
+        else player.x = 333;                     // Faixa Direita
+    });
 }
+
+function update() {
+    // Aqui entra a lógica dos obstáculos vindo de cima para baixo
+}
+</script>
