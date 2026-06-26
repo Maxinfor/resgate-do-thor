@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <title>Resgate do Thor</title>
+    <head>
+    <!-- ... seus links atuais ... -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6a1b9a">
+</head>
+<body>
+    <!-- ... seu conteúdo ... -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
 </head>
 <body>
 
