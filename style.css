@@ -1,0 +1,12 @@
+﻿body { font-family: sans-serif; text-align: center; background: #fce4ec; margin: 0; padding: 20px; }
+#tela-capa { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+#tela-capa img { width: 250px; border-radius: 20px; border: 5px solid #ffca28; }
+#jogo-container { background: white; padding: 20px; border-radius: 20px; }
+#personagens { display: flex; justify-content: center; gap: 20px; }
+#personagens img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #6a1b9a; }
+.balao-fala { background: #fff; border: 2px solid #6a1b9a; border-radius: 15px; padding: 10px; margin: 10px auto; width: 80%; font-style: italic; }
+#area-jogo { height: 150px; position: relative; border-bottom: 2px solid #ddd; margin: 20px 0; }
+#thor-img { width: 80px; position: absolute; left: 0; bottom: 0; transition: left 2s ease-in-out; }
+#energia-container { width: 100%; height: 20px; background: #eee; border-radius: 10px; }
+#energia-bar { height: 100%; width: 100%; background: #6a1b9a; border-radius: 10px; transition: 0.3s; }
+button { padding: 15px 30px; background: #6a1b9a; color: white; border: none; border-radius: 10px; cursor: pointer; }
