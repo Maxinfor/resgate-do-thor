@@ -20,7 +20,7 @@ function create() {
     // Definindo as 3 faixas (X = 66, 200, 333)
     player = this.physics.add.sprite(200, 500, 'helo').setDisplaySize(50, 80);
     player.setCollideWorldBounds(true);
-
+this.physics.add.overlap(player, grupoObstaculos, fimDeJogo, null, this);
     cursors = this.input.keyboard.createCursorKeys();
 
     // Controle de toque para celular (Subway Surfers style)
