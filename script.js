@@ -40,8 +40,8 @@ function create() {
     items = this.physics.add.group();
     
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setDepth(5);
-    // Texto do nível que mudará automaticamente
-    levelText = this.add.text(20, 50, 'Nível: Fácil', { fontSize: '18px', fill: '#555', fontStyle: 'bold' }).setDepth(5);
+    // Inicializa com o valor da variável, não fixo
+    levelText = this.add.text(20, 50, `Nível: ${nomeDificuldade}`, { fontSize: '18px', fill: '#555', fontStyle: 'bold' }).setDepth(5);
 
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
     player.setCollideWorldBounds(true);
@@ -99,8 +99,7 @@ function criarCapa(scene) {
     btnJogar.on('pointerdown', () => { 
         gameStarted = true; 
         musica.play(); 
-        // CORREÇÃO: Atualiza o texto exatamente no momento de começar o jogo
-        levelText.setText(`Nível: ${nomeDificuldade}`); 
+        levelText.setText(`Nível: ${nomeDificuldade}`); // Garante a atualização aqui
         background.destroy(); 
         btnJogar.destroy(); 
         scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
@@ -115,7 +114,6 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
     
     btn.dificuldadeBtn = true;
     
-    // Define destaque inicial no Fácil
     if (texto === 'Fácil') {
         btn.setStroke('#ffffff', 6);
         btn.setAlpha(1);
@@ -125,7 +123,7 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
     btn.on('pointerdown', () => {
         dificuldade = vel;
-        nomeDificuldade = texto; // Atualiza a variável global
+        nomeDificuldade = texto; 
         
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
