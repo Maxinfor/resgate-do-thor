@@ -2,11 +2,8 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    pixelArt: true, // Garante que não haja interpolação borrada
-    physics: { 
-        default: 'arcade', 
-        arcade: { debug: false } 
-    },
+    pixelArt: true,
+    physics: { default: 'arcade', arcade: { debug: false } },
     scene: { preload: preload, create: create, update: update }
 };
 
@@ -14,6 +11,7 @@ const game = new Phaser.Game(config);
 
 let player, items, scoreText, musica, latido;
 let gameStarted = false;
+let dificuldade = 350; // Velocidade padrão (Fácil)
 let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
 
 function preload() {
@@ -53,11 +51,8 @@ function create() {
         item.destroy();
     });
 
-    // Movimentação suavizada mas travada em números inteiros
     this.input.on('pointermove', (p) => { 
-        if(p.isDown && gameStarted) {
-            player.x = Math.round(Phaser.Math.Clamp(p.x, 60, 340));
-        }
+        if(p.isDown && gameStarted) player.x = Math.round(Phaser.Math.Clamp(p.x, 60, 340));
     });
 
     this.time.addEvent({
@@ -67,7 +62,7 @@ function create() {
             let tipos = (estado.personagem === 'thor') ? ['osso', 'carne', 'agua'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
             let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, tipos.length - 1)]);
             item.setDisplaySize(80, 80);
-            item.setVelocityY(350);
+            item.setVelocityY(dificuldade); // Usa a variável de dificuldade
         },
         loop: true
     });
@@ -77,14 +72,43 @@ function create() {
 
 function update() {
     if (!gameStarted) return;
-    
-    // Força a posição dos itens a serem inteiros, eliminando a "tremida"
     items.children.iterate((item) => {
         if (item) {
             item.x = Math.round(item.x);
             item.y = Math.round(item.y);
             if (item.y > 600) gameOver(this);
         }
+    });
+}
+
+function criarCapa(scene) {
+    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff).setDepth(10);
+    
+    // Botões de dificuldade
+    criarBotaoDif(scene, 100, 200, 'Fácil', 350, 0x00ff00);
+    criarBotaoDif(scene, 200, 200, 'Médio', 500, 0xffff00);
+    criarBotaoDif(scene, 300, 200, 'Difícil', 700, 0xff0000);
+
+    let btnJogar = scene.add.text(200, 400, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
+        .setOrigin(0.5).setDepth(11).setInteractive();
+
+    btnJogar.on('pointerdown', () => { 
+        gameStarted = true; 
+        musica.play(); 
+        overlay.destroy(); btnJogar.destroy(); 
+        // Destrói os botões de dificuldade ao iniciar
+        scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
+    });
+}
+
+function criarBotaoDif(scene, x, y, texto, vel, cor) {
+    let btn = scene.add.text(x, y, texto, { backgroundColor: '#ddd', padding: 10 }).setOrigin(0.5).setDepth(11).setInteractive();
+    btn.dificuldadeBtn = true; // Flag para identificar e destruir depois
+    btn.on('pointerdown', () => {
+        dificuldade = vel;
+        // Feedback visual simples
+        scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.setBackgroundColor('#ddd'); });
+        btn.setBackgroundColor('#888');
     });
 }
 
@@ -96,20 +120,6 @@ function criarBotao(scene, x, y, texto, key) {
             player.setTexture(key);
             if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
         });
-}
-
-function criarCapa(scene) {
-    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff).setDepth(10);
-    let btn = scene.add.rectangle(200, 300, 150, 50, 0x00ff00).setDepth(11).setInteractive();
-    let txt = scene.add.text(200, 300, 'JOGAR', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(12);
-    
-    btn.on('pointerdown', () => { 
-        gameStarted = true; 
-        musica.play(); 
-        overlay.destroy(); 
-        btn.destroy(); 
-        txt.destroy(); 
-    });
 }
 
 function gameOver(scene) {
