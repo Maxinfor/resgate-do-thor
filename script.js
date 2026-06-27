@@ -2,67 +2,54 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    physics: { 
-        default: 'arcade', 
-        arcade: { debug: false } 
-    },
-    scene: { 
-        preload: preload, 
-        create: create, 
-        update: update 
-    }
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: { preload: preload, create: create, update: update }
 };
 
 const game = new Phaser.Game(config);
 
 let player;
 let items;
-let score = 0;
 let scoreText;
-let personagem = 'helo';
 let musica;
+let latido;
+
+// Estados do jogo
+let estado = {
+    personagem: 'helo',
+    score: 0,
+    placar: { helo: 0, liz: 0, thor: 0 }
+};
 
 function preload() {
-    // Imagens dos Personagens
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
-    
-    // Imagens dos Itens
     this.load.image('agua', 'agua.jpg');
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
     
-    // Áudio
     this.load.audio('trilha', 'som do jogo.mp3');
+    this.load.audio('latido', 'latido.mp3'); // Certifique-se de ter este arquivo
 }
 
 function create() {
-    // Cor de fundo
     this.cameras.main.setBackgroundColor('#2c3e50');
 
-    // Música contínua
-    musica = this.sound.add('trilha', { loop: true, volume: 0.5 });
-    musica.play();
+    // Música e Som
+    musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
+    latido = this.sound.add('latido', { volume: 0.5 });
 
-    // Botão de Trocar Personagem
-    this.add.text(260, 20, 'Trocar Pers.', { fontSize: '18px', fill: '#ff0', backgroundColor: '#000' })
-        .setInteractive()
-        .on('pointerdown', () => {
-            if (personagem === 'helo') personagem = 'liz';
-            else if (personagem === 'liz') personagem = 'thor';
-            else personagem = 'helo';
-            player.setTexture(personagem);
-        });
+    // Botões de Seleção (Menu superior)
+    criarBotao(this, 60, 30, 'Helo', 'helo');
+    criarBotao(this, 180, 30, 'Liz', 'liz');
+    criarBotao(this, 300, 30, 'Thor', 'thor');
 
-    // Jogador
-    player = this.physics.add.sprite(200, 500, personagem).setDisplaySize(60, 100);
+    player = this.physics.add.sprite(200, 500, estado.personagem).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
-    
-    // Texto de Pontuação
-    scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 
-    // Grupo de Itens
+    scoreText = this.add.text(20, 80, 'Score: 0', { fontSize: '24px', fill: '#fff' });
+
     items = this.physics.add.group();
 
     // Spawner de itens
@@ -70,32 +57,40 @@ function create() {
         delay: 800,
         callback: () => {
             let tipos = ['osso', 'carne', 'agua'];
-            let xPos = [66, 200, 333][Phaser.Math.Between(0, 2)];
-            let item = items.create(xPos, -50, tipos[Phaser.Math.Between(0, 2)]).setDisplaySize(50, 50);
-            item.setVelocityY(400);
+            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]).setDisplaySize(50, 50);
+            // Se for o Thor, aumenta a velocidade em 50%
+            let velocidade = estado.personagem === 'thor' ? 600 : 400;
+            item.setVelocityY(velocidade);
         },
         loop: true
     });
 
-    // Controle de arraste instantâneo
-    this.input.on('pointermove', (pointer) => {
-        if (pointer.isDown) {
-            player.x = Phaser.Math.Clamp(pointer.x, 66, 333);
-        }
-    });
+    this.input.on('pointermove', (p) => { if(p.isDown) player.x = Phaser.Math.Clamp(p.x, 30, 370); });
 
-    // Colisão (Coleta e Penalidade)
     this.physics.add.overlap(player, items, (p, item) => {
-        if (item.texture.key === 'agua') {
-            score -= 20;
-            this.cameras.main.shake(100, 0.01);
-        } else {
-            score += 10;
-        }
-        if (score < 0) score = 0;
-        scoreText.setText('Score: ' + score);
+        estado.placar[estado.personagem] += 10;
+        estado.score = estado.placar[estado.personagem];
+        scoreText.setText(`${estado.personagem.toUpperCase()}: ${estado.score}`);
         item.destroy();
     });
+}
+
+function criarBotao(scene, x, y, texto, key) {
+    scene.add.text(x, y, texto, { backgroundColor: '#000', padding: 5 })
+        .setInteractive()
+        .on('pointerdown', () => {
+            estado.personagem = key;
+            player.setTexture(key);
+            
+            if (key === 'thor') {
+                musica.stop();
+                latido.play();
+                // Toca música após 2 segundos do latido
+                setTimeout(() => musica.play(), 2000);
+            } else if (!musica.isPlaying) {
+                musica.play();
+            }
+        });
 }
 
 function update() {}
