@@ -119,14 +119,25 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
 function vitoria(scene) {
     if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
+    gameStarted = false; 
+    scene.physics.pause();
     
-    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
-    
+    // Fogos no Depth 20
     let p = scene.add.particles('helo'); 
-    p.createEmitter({ x: { min: 50, max: 350 }, y: { min: 100, max: 500 }, speed: 150, scale: { start: 0.8, end: 0 }, lifespan: 1500, quantity: 40, blendMode: 'ADD' });
+    p.setDepth(20);
+    p.createEmitter({ 
+        x: { min: 50, max: 350 }, y: { min: 100, max: 500 }, speed: 150, 
+        scale: { start: 0.8, end: 0 }, lifespan: 2000, quantity: 40, blendMode: 'ADD' 
+    });
+
+    // Frase e botão no Depth 30 (Por cima dos fogos)
+    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { 
+        fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center', stroke: '#ffffff', strokeThickness: 6 
+    }).setOrigin(0.5).setDepth(30);
     
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
+    scene.add.text(200, 450, 'REINICIAR', { 
+        fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 
+    }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
 }
 
 function criarBotao(scene, x, y, texto, key) {
