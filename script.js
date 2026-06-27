@@ -11,10 +11,13 @@ const game = new Phaser.Game(config);
 
 let player, items, scoreText, musica, latido;
 let gameStarted = false;
-let dificuldade = 300; // Fácil padrão
+let dificuldade = 300; 
 let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
 
 function preload() {
+    // Carregar Capa
+    this.load.image('capa', 'capa.jpg');
+    
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
@@ -36,7 +39,7 @@ function create() {
     latido = this.sound.add('latido', { volume: 0.5 });
 
     items = this.physics.add.group();
-    scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
+    scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setDepth(5);
 
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
     player.setCollideWorldBounds(true);
@@ -82,20 +85,21 @@ function update() {
 }
 
 function criarCapa(scene) {
-    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff).setDepth(10);
+    // Exibe a imagem da capa ocupando a tela toda
+    let background = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
     
-    // Níveis de dificuldade com texto em PRETO e cores suaves de fundo
-    criarBotaoDif(scene, 80, 200, 'Fácil', 300, 0x90EE90); // Verde claro
-    criarBotaoDif(scene, 200, 200, 'Médio', 450, 0xFFE4B5); // Laranja claro
-    criarBotaoDif(scene, 320, 200, 'Difícil', 600, 0xFFB6C1); // Rosa claro
+    criarBotaoDif(scene, 80, 480, 'Fácil', 300, 0x90EE90);
+    criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xFFE4B5);
+    criarBotaoDif(scene, 320, 480, 'Difícil', 600, 0xFFB6C1);
 
-    let btnJogar = scene.add.text(200, 400, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
+    let btnJogar = scene.add.text(200, 530, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
         .setOrigin(0.5).setDepth(11).setInteractive();
 
     btnJogar.on('pointerdown', () => { 
         gameStarted = true; 
         musica.play(); 
-        overlay.destroy(); btnJogar.destroy(); 
+        background.destroy(); 
+        btnJogar.destroy(); 
         scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
     });
 }
@@ -103,9 +107,7 @@ function criarCapa(scene) {
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
     let btn = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(11).setInteractive();
     btn.dificuldadeBtn = true;
-    btn.on('pointerdown', () => {
-        dificuldade = vel;
-    });
+    btn.on('pointerdown', () => { dificuldade = vel; });
 }
 
 function criarBotao(scene, x, y, texto, key) {
