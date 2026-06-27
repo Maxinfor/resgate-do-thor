@@ -31,14 +31,14 @@ function create() {
 
     items = this.physics.add.group();
 
-    // 1. SCORE: No topo absoluto (Y=30)
-    scoreText = this.add.text(20, 30, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
+    // Score no topo
+    scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
 
-    // 2. PLAYER: Centralizado verticalmente (Y=400)
+    // Player
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(80, 80);
     player.setCollideWorldBounds(true);
 
-    // 3. BOTÕES: Na parte inferior (Y=550) - Longe do score
+    // Botões na base (não cobrem o score)
     criarBotao(this, 100, 550, 'Helo', 'helo');
     criarBotao(this, 200, 550, 'Liz', 'liz');
     criarBotao(this, 300, 550, 'Thor', 'thor');
@@ -60,34 +60,33 @@ function create() {
             let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]);
             item.setDisplaySize(50, 50);
             item.setVelocityY(350);
-            
-            // Regra: Se cair no chão, Game Over
-            item.setCollideWorldBounds(true);
-            item.body.onWorldBounds = true;
         },
         loop: true
-    });
-
-    // Detecta impacto com o limite inferior (chão)
-    this.physics.world.on('worldbounds', (body) => {
-        if (body.gameObject.y >= 580) { // Y próximo ao fundo da tela
-            gameOver(this);
-        }
     });
 
     criarCapa(this);
 }
 
-function criarBotao(scene, x, y, texto, key) {
-    let btn = scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
-        .setOrigin(0.5)
-        .setInteractive();
-    
-    btn.on('pointerdown', () => {
-        estado.personagem = key;
-        player.setTexture(key);
-        if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+function update() {
+    if (!gameStarted) return;
+
+    // Lógica de derrota (se o item passar da tela)
+    items.children.iterate((item) => {
+        if (item && item.y > 600) {
+            gameOver(this);
+        }
     });
+}
+
+function criarBotao(scene, x, y, texto, key) {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
+        .setOrigin(0.5)
+        .setInteractive()
+        .on('pointerdown', () => {
+            estado.personagem = key;
+            player.setTexture(key);
+            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+        });
 }
 
 function criarCapa(scene) {
@@ -111,5 +110,3 @@ function gameOver(scene) {
     let btnReset = scene.add.text(200, 350, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
     btnReset.on('pointerdown', () => location.reload());
 }
-
-function update() {}
