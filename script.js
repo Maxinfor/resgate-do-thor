@@ -2,8 +2,15 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    physics: { default: 'arcade', arcade: { debug: false } },
-    scene: { preload: preload, create: create, update: update }
+    physics: { 
+        default: 'arcade', 
+        arcade: { debug: false } 
+    },
+    scene: { 
+        preload: preload, 
+        create: create, 
+        update: update 
+    }
 };
 
 const game = new Phaser.Game(config);
@@ -16,21 +23,22 @@ let personagem = 'helo';
 let musica;
 
 function preload() {
-    // Imagens das Personagens
+    // Imagens dos Personagens
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
     
-    // Itens (Certifique-se que esses arquivos existem na sua pasta)
-    this.load.image('osso', 'osso.jpg');
-    this.load.image('carne', 'carne.jpg');
+    // Imagens dos Itens
     this.load.image('agua', 'agua.jpg');
+    this.load.image('carne', 'carne.jpg');
+    this.load.image('osso', 'osso.jpg');
     
     // Áudio
     this.load.audio('trilha', 'som do jogo.mp3');
 }
 
 function create() {
+    // Cor de fundo
     this.cameras.main.setBackgroundColor('#2c3e50');
 
     // Música contínua
@@ -51,12 +59,13 @@ function create() {
     player = this.physics.add.sprite(200, 500, personagem).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
     
+    // Texto de Pontuação
     scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 
     // Grupo de Itens
     items = this.physics.add.group();
 
-    // Spawner de itens constante
+    // Spawner de itens
     this.time.addEvent({
         delay: 800,
         callback: () => {
@@ -75,7 +84,7 @@ function create() {
         }
     });
 
-    // Colisão sem pausar o jogo
+    // Colisão (Coleta e Penalidade)
     this.physics.add.overlap(player, items, (p, item) => {
         if (item.texture.key === 'agua') {
             score -= 20;
