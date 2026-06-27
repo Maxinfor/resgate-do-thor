@@ -26,7 +26,8 @@ function preload() {
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
     
-    this.load.audio('trilha', 'musica.mp3');
+    // Nomes de arquivo simplificados
+    this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
 }
 
@@ -37,26 +38,22 @@ function create() {
     latido = this.sound.add('latido', { volume: 0.5 });
     musica.play();
 
-    // Botões de Seleção
+    // Botões de Personagem
     criarBotao(this, 50, 30, 'Helo', 'helo');
     criarBotao(this, 150, 30, 'Liz', 'liz');
     criarBotao(this, 250, 30, 'Thor', 'thor');
 
-    // Botão de Finalizar
+    // Botão Fim
     this.add.text(320, 30, 'Fim', { backgroundColor: '#ff0000', padding: 5 })
         .setInteractive()
         .on('pointerdown', () => {
-            console.log("--- RESULTADO FINAL ---");
-            console.log("Helô:", estado.placar.helo);
-            console.log("Liz:", estado.placar.liz);
-            console.log("Thor:", estado.placar.thor);
-            alert(`Fim de jogo!\nHelô: ${estado.placar.helo}\nLiz: ${estado.placar.liz}\nThor: ${estado.placar.thor}`);
-            location.reload(); // Reinicia o jogo
+            alert(`Placar Final:\nHelô: ${estado.placar.helo}\nLiz: ${estado.placar.liz}\nThor: ${estado.placar.thor}`);
+            console.log("Placar Final:", estado.placar);
+            location.reload();
         });
 
     player = this.physics.add.sprite(200, 500, estado.personagem).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
-
     scoreText = this.add.text(20, 80, 'Score: 0', { fontSize: '24px', fill: '#fff' });
 
     items = this.physics.add.group();
@@ -66,8 +63,9 @@ function create() {
         callback: () => {
             let tipos = ['osso', 'carne', 'agua'];
             let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]).setDisplaySize(50, 50);
-            let velocidade = estado.personagem === 'thor' ? 600 : 400;
-            item.setVelocityY(velocidade);
+            // Regra: Thor faz os itens caírem mais rápido (dificuldade)
+            let vel = (estado.personagem === 'thor') ? 600 : 400;
+            item.setVelocityY(vel);
         },
         loop: true
     });
@@ -87,10 +85,14 @@ function criarBotao(scene, x, y, texto, key) {
         .on('pointerdown', () => {
             estado.personagem = key;
             player.setTexture(key);
+            
+            // Regra: Thor toca latido primeiro, depois a música
             if (key === 'thor') {
                 musica.stop();
                 latido.play();
                 setTimeout(() => musica.play(), 1500);
+            } else {
+                if(!musica.isPlaying) musica.play();
             }
         });
 }
