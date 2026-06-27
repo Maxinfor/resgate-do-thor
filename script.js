@@ -2,9 +2,11 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    // Adicionado pixelArt: true para evitar "tremidas" (anti-aliasing de movimento)
-    pixelArt: true, 
-    physics: { default: 'arcade', arcade: { debug: false } },
+    pixelArt: true, // Garante que não haja interpolação borrada
+    physics: { 
+        default: 'arcade', 
+        arcade: { debug: false } 
+    },
     scene: { preload: preload, create: create, update: update }
 };
 
@@ -51,9 +53,9 @@ function create() {
         item.destroy();
     });
 
+    // Movimentação suavizada mas travada em números inteiros
     this.input.on('pointermove', (p) => { 
         if(p.isDown && gameStarted) {
-            // Arredondar a posição para evitar "tremida" visual
             player.x = Math.round(Phaser.Math.Clamp(p.x, 60, 340));
         }
     });
@@ -76,14 +78,45 @@ function create() {
 function update() {
     if (!gameStarted) return;
     
-    // Força o arredondamento dos itens para evitar jitter visual
+    // Força a posição dos itens a serem inteiros, eliminando a "tremida"
     items.children.iterate((item) => {
         if (item) {
             item.x = Math.round(item.x);
             item.y = Math.round(item.y);
-            if (item.y > 600) gameOver(this); 
+            if (item.y > 600) gameOver(this);
         }
     });
 }
 
-// ... (funções criarBotao, criarCapa e gameOver permanecem iguais)
+function criarBotao(scene, x, y, texto, key) {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
+        .setOrigin(0.5).setInteractive()
+        .on('pointerdown', () => {
+            estado.personagem = key;
+            player.setTexture(key);
+            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+        });
+}
+
+function criarCapa(scene) {
+    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff).setDepth(10);
+    let btn = scene.add.rectangle(200, 300, 150, 50, 0x00ff00).setDepth(11).setInteractive();
+    let txt = scene.add.text(200, 300, 'JOGAR', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(12);
+    
+    btn.on('pointerdown', () => { 
+        gameStarted = true; 
+        musica.play(); 
+        overlay.destroy(); 
+        btn.destroy(); 
+        txt.destroy(); 
+    });
+}
+
+function gameOver(scene) {
+    if(!gameStarted) return;
+    gameStarted = false;
+    scene.physics.pause();
+    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
+    let btnReset = scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
+    btnReset.on('pointerdown', () => location.reload());
+}
