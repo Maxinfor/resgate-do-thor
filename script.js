@@ -26,7 +26,7 @@ function preload() {
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
     
-    this.load.audio('trilha', 'som do jogo.mp3');
+    this.load.audio('trilha', 'musica.mp3');
     this.load.audio('latido', 'latido.mp3');
 }
 
