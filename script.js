@@ -28,8 +28,6 @@ function preload() {
     this.load.image('oculos', 'oculos.jpg');
     this.load.image('tenis1', 'tenis1.jpg');
     this.load.image('tenis2', 'tenis2.jpg');
-    // Carregue uma imagem para o item dourado (ou use uma das existentes)
-    this.load.image('ouro', 'osso.jpg'); // Estou usando osso como exemplo, troque pelo seu arquivo dourado
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
 }
@@ -52,8 +50,8 @@ function create() {
     criarBotao(this, 300, 550, 'Thor', 'thor');
 
     this.physics.add.overlap(player, items, (p, item) => {
-        // Verifica se o item é dourado (temos uma propriedade 'isGold' nele)
-        let pontos = item.isGold ? 20 : 10;
+        // Regra: Item comum 10 pontos, Dourado 60 (10 + 50)
+        let pontos = item.isGold ? 60 : 10;
         estado.placar[estado.personagem] += pontos;
         
         scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
@@ -75,15 +73,13 @@ function create() {
             let tipos = (estado.personagem === 'thor') ? ['osso', 'carne', 'agua'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
             
-            // Lógica do Item Dourado (10% de chance)
+            // 10% de chance de ser dourado
             let isGold = Phaser.Math.Between(1, 10) === 1;
-            let item = items.create(Phaser.Math.Between(50, 350), -50, isGold ? 'ouro' : key);
+            let item = items.create(Phaser.Math.Between(50, 350), -50, key);
             
             item.setDisplaySize(80, 80);
             item.setVelocityY(dificuldade);
-            item.isGold = isGold; // Marca o item como dourado ou não
-            
-            // Feedback visual para o dourado: coloca uma cor amarela
+            item.isGold = isGold;
             if (isGold) item.setTint(0xFFD700);
         },
         loop: true
@@ -91,8 +87,6 @@ function create() {
 
     criarCapa(this);
 }
-
-// --- Funções de apoio (Capa, Botões, Fogos) permanecem as mesmas ---
 
 function update() {
     if (!gameStarted) return;
@@ -107,7 +101,6 @@ function update() {
 
 function criarCapa(scene) {
     let background = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
-    
     criarBotaoDif(scene, 80, 480, 'Fácil', 300, 0x90EE90);
     criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xDDDDDD);
     criarBotaoDif(scene, 320, 480, 'Difícil', 600, 0xFFB6C1);
@@ -126,11 +119,7 @@ function criarCapa(scene) {
 }
 
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
-    let btn = scene.add.text(x, y, texto, { 
-        backgroundColor: '#' + cor.toString(16).padStart(6, '0'), 
-        padding: 10, color: '#000000', fontStyle: 'bold' 
-    }).setOrigin(0.5).setDepth(11).setInteractive();
-    
+    let btn = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(11).setInteractive();
     btn.dificuldadeBtn = true;
     if (texto === 'Fácil') { btn.setStroke('#ffffff', 6); btn.setAlpha(1); } else { btn.setAlpha(0.6); }
 
@@ -147,23 +136,14 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 }
 
 function dispararFogos(scene, x, y) {
-    let particles = scene.add.particles('helo'); 
-    let emitter = particles.createEmitter({
-        x: x, y: y,
-        speed: { min: -300, max: 300 },
-        angle: { min: 0, max: 360 },
-        scale: { start: 0.8, end: 0 },
-        blendMode: 'ADD',
-        lifespan: 800,
-        quantity: 30,
-        tint: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
-    });
-    scene.time.delayedCall(800, () => particles.destroy());
+    // Efeito mais simples para não travar
+    let p = scene.add.particles('helo'); 
+    let e = p.createEmitter({ x, y, speed: 200, scale: 0.5, lifespan: 500, quantity: 15 });
+    scene.time.delayedCall(500, () => p.destroy());
 }
 
 function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
-        .setOrigin(0.5).setInteractive()
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive()
         .on('pointerdown', () => {
             estado.personagem = key;
             player.setTexture(key);
