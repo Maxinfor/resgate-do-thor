@@ -12,7 +12,7 @@ const game = new Phaser.Game(config);
 let player, items, scoreText, levelText, musica, latido;
 let gameStarted = false;
 let dificuldade = 300; 
-let nomeDificuldade = "Fácil"; // Variável para o texto na tela
+let nomeDificuldade = "Fácil"; 
 let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
 
 function preload() {
@@ -39,9 +39,9 @@ function create() {
 
     items = this.physics.add.group();
     
-    // Score e Nível na tela
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setDepth(5);
-    levelText = this.add.text(20, 50, 'Nível: Fácil', { fontSize: '18px', fill: '#555' }).setDepth(5);
+    // Texto do nível que mudará automaticamente
+    levelText = this.add.text(20, 50, 'Nível: Fácil', { fontSize: '18px', fill: '#555', fontStyle: 'bold' }).setDepth(5);
 
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
     player.setCollideWorldBounds(true);
@@ -99,6 +99,8 @@ function criarCapa(scene) {
     btnJogar.on('pointerdown', () => { 
         gameStarted = true; 
         musica.play(); 
+        // CORREÇÃO: Atualiza o texto exatamente no momento de começar o jogo
+        levelText.setText(`Nível: ${nomeDificuldade}`); 
         background.destroy(); 
         btnJogar.destroy(); 
         scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
@@ -113,6 +115,7 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
     
     btn.dificuldadeBtn = true;
     
+    // Define destaque inicial no Fácil
     if (texto === 'Fácil') {
         btn.setStroke('#ffffff', 6);
         btn.setAlpha(1);
@@ -122,8 +125,7 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
     btn.on('pointerdown', () => {
         dificuldade = vel;
-        nomeDificuldade = texto; // Atualiza o nome da dificuldade
-        levelText.setText(`Nível: ${nomeDificuldade}`); // Atualiza o texto na tela
+        nomeDificuldade = texto; // Atualiza a variável global
         
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
