@@ -4,26 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Resgate do Thor</title>
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6a1b9a">
-    
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    
     <style>
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fce4ec; overflow: hidden; }
         canvas { border: 2px solid #6a1b9a; border-radius: 10px; }
     </style>
 </head>
 <body>
-
-    <script>
-        // Registrar Service Worker para PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
-    
     <script src="script.js"></script>
 </body>
 </html>
