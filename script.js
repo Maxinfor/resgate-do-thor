@@ -26,25 +26,33 @@ function preload() {
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
     
-    // Carregando o áudio da trilha sonora e o latido
     this.load.audio('trilha', 'som do jogo.mp3');
-    this.load.audio('latido', 'latido.mp3'); 
+    this.load.audio('latido', 'latido.mp3');
 }
 
 function create() {
     this.cameras.main.setBackgroundColor('#2c3e50');
 
-    // Inicializando sons
     musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
     latido = this.sound.add('latido', { volume: 0.5 });
-
-    // Inicia a música principal automaticamente
     musica.play();
 
     // Botões de Seleção
-    criarBotao(this, 60, 30, 'Helo', 'helo');
-    criarBotao(this, 180, 30, 'Liz', 'liz');
-    criarBotao(this, 300, 30, 'Thor', 'thor');
+    criarBotao(this, 50, 30, 'Helo', 'helo');
+    criarBotao(this, 150, 30, 'Liz', 'liz');
+    criarBotao(this, 250, 30, 'Thor', 'thor');
+
+    // Botão de Finalizar
+    this.add.text(320, 30, 'Fim', { backgroundColor: '#ff0000', padding: 5 })
+        .setInteractive()
+        .on('pointerdown', () => {
+            console.log("--- RESULTADO FINAL ---");
+            console.log("Helô:", estado.placar.helo);
+            console.log("Liz:", estado.placar.liz);
+            console.log("Thor:", estado.placar.thor);
+            alert(`Fim de jogo!\nHelô: ${estado.placar.helo}\nLiz: ${estado.placar.liz}\nThor: ${estado.placar.thor}`);
+            location.reload(); // Reinicia o jogo
+        });
 
     player = this.physics.add.sprite(200, 500, estado.personagem).setDisplaySize(60, 100);
     player.setCollideWorldBounds(true);
@@ -79,12 +87,9 @@ function criarBotao(scene, x, y, texto, key) {
         .on('pointerdown', () => {
             estado.personagem = key;
             player.setTexture(key);
-            
-            // Regra do Thor: Latido antes da música
             if (key === 'thor') {
                 musica.stop();
                 latido.play();
-                // Retoma a música após o latido (ajuste o tempo conforme a duração do som)
                 setTimeout(() => musica.play(), 1500);
             }
         });
