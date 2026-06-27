@@ -2,7 +2,7 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    pixelArt: true,
+    pixelArt: true, // Evita borrão e trepidação
     physics: { default: 'arcade', arcade: { debug: false } },
     scene: { preload: preload, create: create, update: update }
 };
@@ -11,13 +11,11 @@ const game = new Phaser.Game(config);
 
 let player, items, scoreText, musica, latido;
 let gameStarted = false;
-let dificuldade = 300; 
+let dificuldade = 300; // Fácil padrão
 let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
 
 function preload() {
-    // Carregar Capa
     this.load.image('capa', 'capa.jpg');
-    
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
@@ -85,7 +83,6 @@ function update() {
 }
 
 function criarCapa(scene) {
-    // Exibe a imagem da capa ocupando a tela toda
     let background = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
     
     criarBotaoDif(scene, 80, 480, 'Fácil', 300, 0x90EE90);
@@ -105,9 +102,24 @@ function criarCapa(scene) {
 }
 
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
-    let btn = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(11).setInteractive();
+    let btn = scene.add.text(x, y, texto, { 
+        backgroundColor: '#' + cor.toString(16).padStart(6, '0'), 
+        padding: 10, color: '#000000', fontStyle: 'bold' 
+    }).setOrigin(0.5).setDepth(11).setInteractive();
+    
     btn.dificuldadeBtn = true;
-    btn.on('pointerdown', () => { dificuldade = vel; });
+    
+    if (texto === 'Fácil') btn.setStroke('#ffffff', 4);
+
+    btn.on('pointerdown', () => {
+        dificuldade = vel;
+        scene.children.list.forEach(c => {
+            if (c.dificuldadeBtn) {
+                c.setStroke(c === btn ? '#ffffff' : 'none', c === btn ? 4 : 0);
+                c.setAlpha(c === btn ? 1 : 0.6);
+            }
+        });
+    });
 }
 
 function criarBotao(scene, x, y, texto, key) {
