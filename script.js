@@ -2,7 +2,7 @@ const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
-    pixelArt: true, // Evita borrão e trepidação
+    pixelArt: true,
     physics: { default: 'arcade', arcade: { debug: false } },
     scene: { preload: preload, create: create, update: update }
 };
@@ -109,13 +109,18 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
     
     btn.dificuldadeBtn = true;
     
-    if (texto === 'Fácil') btn.setStroke('#ffffff', 4);
+    if (texto === 'Fácil') {
+        btn.setStroke('#ffffff', 6);
+        btn.setAlpha(1);
+    } else {
+        btn.setAlpha(0.6);
+    }
 
     btn.on('pointerdown', () => {
         dificuldade = vel;
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
-                c.setStroke(c === btn ? '#ffffff' : 'none', c === btn ? 4 : 0);
+                c.setStroke(c === btn ? '#ffffff' : 'none', c === btn ? 6 : 0);
                 c.setAlpha(c === btn ? 1 : 0.6);
             }
         });
