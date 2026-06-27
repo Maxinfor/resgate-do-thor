@@ -28,6 +28,8 @@ function preload() {
     this.load.image('oculos', 'oculos.jpg');
     this.load.image('tenis1', 'tenis1.jpg');
     this.load.image('tenis2', 'tenis2.jpg');
+    // Carregue uma imagem para o item dourado (ou use uma das existentes)
+    this.load.image('ouro', 'osso.jpg'); // Estou usando osso como exemplo, troque pelo seu arquivo dourado
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
 }
@@ -50,11 +52,13 @@ function create() {
     criarBotao(this, 300, 550, 'Thor', 'thor');
 
     this.physics.add.overlap(player, items, (p, item) => {
-        estado.placar[estado.personagem] += 10;
+        // Verifica se o item é dourado (temos uma propriedade 'isGold' nele)
+        let pontos = item.isGold ? 20 : 10;
+        estado.placar[estado.personagem] += pontos;
+        
         scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
 
-        // Fogos de artifício a cada 50 objetos (50 * 10 pontos = 500)
         if (estado.placar[estado.personagem] % 500 === 0) {
             dispararFogos(this, player.x, player.y);
         }
@@ -69,15 +73,26 @@ function create() {
         callback: () => {
             if(!gameStarted) return;
             let tipos = (estado.personagem === 'thor') ? ['osso', 'carne', 'agua'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
-            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, tipos.length - 1)]);
+            let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
+            
+            // Lógica do Item Dourado (10% de chance)
+            let isGold = Phaser.Math.Between(1, 10) === 1;
+            let item = items.create(Phaser.Math.Between(50, 350), -50, isGold ? 'ouro' : key);
+            
             item.setDisplaySize(80, 80);
             item.setVelocityY(dificuldade);
+            item.isGold = isGold; // Marca o item como dourado ou não
+            
+            // Feedback visual para o dourado: coloca uma cor amarela
+            if (isGold) item.setTint(0xFFD700);
         },
         loop: true
     });
 
     criarCapa(this);
 }
+
+// --- Funções de apoio (Capa, Botões, Fogos) permanecem as mesmas ---
 
 function update() {
     if (!gameStarted) return;
@@ -117,13 +132,7 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
     }).setOrigin(0.5).setDepth(11).setInteractive();
     
     btn.dificuldadeBtn = true;
-    
-    if (texto === 'Fácil') {
-        btn.setStroke('#ffffff', 6);
-        btn.setAlpha(1);
-    } else {
-        btn.setAlpha(0.6);
-    }
+    if (texto === 'Fácil') { btn.setStroke('#ffffff', 6); btn.setAlpha(1); } else { btn.setAlpha(0.6); }
 
     btn.on('pointerdown', () => {
         dificuldade = vel;
