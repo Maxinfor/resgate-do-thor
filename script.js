@@ -24,7 +24,6 @@ function preload() {
 }
 
 function create() {
-    // 1. Fundo Branco
     this.cameras.main.setBackgroundColor('#ffffff');
 
     musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
@@ -32,57 +31,64 @@ function create() {
 
     items = this.physics.add.group();
 
-    scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
+    // Placar no topo
+    scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
 
-    player = this.physics.add.sprite(200, 500, estado.personagem).setDisplaySize(60, 100);
+    player = this.physics.add.sprite(200, 450, estado.personagem).setDisplaySize(80, 80);
     player.setCollideWorldBounds(true);
 
-    criarBotao(this, 50, 30, 'Helo', 'helo');
-    criarBotao(this, 150, 30, 'Liz', 'liz');
-    criarBotao(this, 250, 30, 'Thor', 'thor');
+    // Botões na parte inferior (abaixo do player)
+    criarBotao(this, 100, 550, 'Helo', 'helo');
+    criarBotao(this, 200, 550, 'Liz', 'liz');
+    criarBotao(this, 300, 550, 'Thor', 'thor');
 
-    // Colisão e Lógica de Pontos
+    // Colisão
     this.physics.add.overlap(player, items, (p, item) => {
         estado.placar[estado.personagem] += 10;
-        scoreText.setText(`${estado.personagem.toUpperCase()}: ${estado.placar[estado.personagem]}`);
+        scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
     });
 
-    this.input.on('pointermove', (p) => { if(p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 30, 370); });
+    this.input.on('pointermove', (p) => { if(p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 40, 360); });
 
-    // Gerador de itens com Lógica de Derrota (Game Over se cair)
+    // Gerador
     this.time.addEvent({
         delay: 800,
         callback: () => {
             if(!gameStarted) return;
             let tipos = ['osso', 'carne', 'agua'];
-            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]).setDisplaySize(50, 50);
-            item.setVelocityY(400);
+            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]);
+            item.setDisplaySize(50, 50);
+            item.setVelocityY(350);
             
-            // Verifica se o item caiu abaixo da tela
-            this.physics.add.collider(item, this.physics.world.bounds, (i) => {
-                if (i.y > 580) gameOver(this);
-            });
+            // Verifica se o item passou da altura do player
+            item.setCollideWorldBounds(true);
+            item.body.onWorldBounds = true;
         },
         loop: true
+    });
+
+    this.physics.world.on('worldbounds', (body) => {
+        if (body.gameObject.y > 500) gameOver(this);
     });
 
     criarCapa(this);
 }
 
 function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
-        .setInteractive()
-        .on('pointerdown', () => {
-            estado.personagem = key;
-            player.setTexture(key);
-            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
-        });
+    let btn = scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
+        .setOrigin(0.5)
+        .setInteractive();
+    
+    btn.on('pointerdown', () => {
+        estado.personagem = key;
+        player.setTexture(key);
+        if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+    });
 }
 
 function criarCapa(scene) {
     let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff).setDepth(10);
-    // 2. Botão verde com palavra JOGAR em preto
     let btn = scene.add.rectangle(200, 300, 150, 50, 0x00ff00).setDepth(11).setInteractive();
     let txt = scene.add.text(200, 300, 'JOGAR', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(12);
     
@@ -97,7 +103,10 @@ function gameOver(scene) {
     if(!gameStarted) return;
     gameStarted = false;
     scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#f00' }).setOrigin(0.5);
+    scene.add.text(200, 250, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5);
+    
+    let btnReset = scene.add.text(200, 350, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', padding: 10 }).setOrigin(0.5).setInteractive();
+    btnReset.on('pointerdown', () => location.reload());
 }
 
 function update() {}
