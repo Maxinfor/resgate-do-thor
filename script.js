@@ -24,47 +24,48 @@ function preload() {
 }
 
 function create() {
-    // Fundo branco conforme solicitado
     this.cameras.main.setBackgroundColor('#ffffff');
 
     musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
     latido = this.sound.add('latido', { volume: 0.5 });
 
     items = this.physics.add.group();
+    scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' });
 
-    // Painel de UI (com cor diferente para destacar no fundo branco)
-    this.add.rectangle(200, 40, 400, 80, 0xecf0f1).setStrokeStyle(2, 0xbdc3c7);
-    scoreText = this.add.text(20, 80, 'Score: 0', { fontSize: '24px', fill: '#2c3e50', fontStyle: 'bold' });
-
-    // Jogador
-    player = this.physics.add.sprite(200, 500, estado.personagem).setDisplaySize(60, 100);
+    player = this.physics.add.sprite(200, 520, estado.personagem).setDisplaySize(80, 80);
     player.setCollideWorldBounds(true);
 
-    // Botões
-    criarBotao(this, 50, 30, 'Helo', 'helo');
-    criarBotao(this, 150, 30, 'Liz', 'liz');
-    criarBotao(this, 250, 30, 'Thor', 'thor');
-
-    // Colisão
+    // Regras de colisão
     this.physics.add.overlap(player, items, (p, item) => {
+        // Thor ganha com tudo; outros pets mantêm a pontuação normal
         estado.placar[estado.personagem] += 10;
-        scoreText.setText(`${estado.personagem.toUpperCase()}: ${estado.placar[estado.personagem]}`);
+        scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
     });
 
-    // Controle
-    this.input.on('pointermove', (p) => { if(p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 30, 370); });
+    this.input.on('pointermove', (p) => { if(p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 40, 360); });
 
-    // Gerador de itens
     this.time.addEvent({
         delay: 800,
         callback: () => {
             if(!gameStarted) return;
             let tipos = ['osso', 'carne', 'agua'];
-            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]).setDisplaySize(50, 50);
-            item.setVelocityY(400);
+            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, 2)]);
+            item.setDisplaySize(50, 50);
+            item.setVelocityY(350);
+            
+            // Ativa detecção de borda para o item
+            item.setCollideWorldBounds(true);
+            item.body.onWorldBounds = true;
         },
         loop: true
+    });
+
+    // Detecta se o item passou da tela (Game Over)
+    this.physics.world.on('worldbounds', (body) => {
+        if (body.gameObject.y > 500) {
+            gameOver(this);
+        }
     });
 
     criarCapa(this);
@@ -81,14 +82,24 @@ function criarBotao(scene, x, y, texto, key) {
 }
 
 function criarCapa(scene) {
-    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff, 0.95).setDepth(10);
-    let btn = scene.add.text(200, 300, 'JOGAR', { fontSize: '30px', backgroundColor: '#2c3e50', color: '#ffffff', padding: 15 }).setOrigin(0.5).setDepth(11).setInteractive();
+    let overlay = scene.add.rectangle(200, 300, 400, 600, 0xffffff, 1).setDepth(10);
+    let btn = scene.add.rectangle(200, 300, 200, 60, 0x2ecc71).setDepth(11).setInteractive();
+    let txt = scene.add.text(200, 300, 'JOGAR', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(12);
+    
+    // Botões de seleção de pet na capa
+    criarBotao(scene, 100, 400, 'Helo', 'helo');
+    criarBotao(scene, 180, 400, 'Liz', 'liz');
+    criarBotao(scene, 260, 400, 'Thor', 'thor');
+
     btn.on('pointerdown', () => { 
         gameStarted = true; 
         musica.play(); 
-        overlay.destroy(); 
-        btn.destroy(); 
+        overlay.destroy(); btn.destroy(); txt.destroy(); 
     });
 }
 
-function update() {}
+function gameOver(scene) {
+    if(!gameStarted) return;
+    gameStarted = false;
+    scene.physics.pause();
+    scene.add.text(200, 3
