@@ -9,9 +9,10 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-let player, items, scoreText, musica, latido;
+let player, items, scoreText, levelText, musica, latido;
 let gameStarted = false;
-let dificuldade = 300; // Fácil padrão
+let dificuldade = 300; 
+let nomeDificuldade = "Fácil"; // Variável para o texto na tela
 let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
 
 function preload() {
@@ -37,7 +38,10 @@ function create() {
     latido = this.sound.add('latido', { volume: 0.5 });
 
     items = this.physics.add.group();
+    
+    // Score e Nível na tela
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setDepth(5);
+    levelText = this.add.text(20, 50, 'Nível: Fácil', { fontSize: '18px', fill: '#555' }).setDepth(5);
 
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
     player.setCollideWorldBounds(true);
@@ -118,6 +122,9 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
     btn.on('pointerdown', () => {
         dificuldade = vel;
+        nomeDificuldade = texto; // Atualiza o nome da dificuldade
+        levelText.setText(`Nível: ${nomeDificuldade}`); // Atualiza o texto na tela
+        
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
                 c.setStroke(c === btn ? '#ffffff' : 'none', c === btn ? 6 : 0);
