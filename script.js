@@ -13,21 +13,32 @@ let items;
 let score = 0;
 let scoreText;
 let personagem = 'helo';
+let musica;
 
 function preload() {
+    // Imagens das Personagens
     this.load.image('helo', 'helo.jpg');
     this.load.image('liz', 'liz.jpg');
-    this.load.image('thor', 'thor.jpg'); // O Thor agora também é um personagem
+    this.load.image('thor', 'thor.jpg');
+    
+    // Itens (Certifique-se que esses arquivos existem na sua pasta)
     this.load.image('osso', 'osso.jpg');
     this.load.image('carne', 'carne.jpg');
     this.load.image('agua', 'agua.jpg');
+    
+    // Áudio
+    this.load.audio('trilha', 'som do jogo.mp3');
 }
 
 function create() {
     this.cameras.main.setBackgroundColor('#2c3e50');
 
-    // Botão de Trocar Personagem (Helô -> Liz -> Thor -> Helô)
-    this.add.text(280, 20, 'Trocar Pers.', { fontSize: '16px', fill: '#ff0' })
+    // Música contínua
+    musica = this.sound.add('trilha', { loop: true, volume: 0.5 });
+    musica.play();
+
+    // Botão de Trocar Personagem
+    this.add.text(260, 20, 'Trocar Pers.', { fontSize: '18px', fill: '#ff0', backgroundColor: '#000' })
         .setInteractive()
         .on('pointerdown', () => {
             if (personagem === 'helo') personagem = 'liz';
@@ -36,12 +47,16 @@ function create() {
             player.setTexture(personagem);
         });
 
+    // Jogador
     player = this.physics.add.sprite(200, 500, personagem).setDisplaySize(60, 100);
+    player.setCollideWorldBounds(true);
     
     scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 
+    // Grupo de Itens
     items = this.physics.add.group();
 
+    // Spawner de itens constante
     this.time.addEvent({
         delay: 800,
         callback: () => {
@@ -53,11 +68,14 @@ function create() {
         loop: true
     });
 
+    // Controle de arraste instantâneo
     this.input.on('pointermove', (pointer) => {
-        if (pointer.isDown) player.x = Phaser.Math.Clamp(pointer.x, 66, 333);
+        if (pointer.isDown) {
+            player.x = Phaser.Math.Clamp(pointer.x, 66, 333);
+        }
     });
 
-    // COLISÃO SEM PARAR O JOGO
+    // Colisão sem pausar o jogo
     this.physics.add.overlap(player, items, (p, item) => {
         if (item.texture.key === 'agua') {
             score -= 20;
@@ -67,7 +85,7 @@ function create() {
         }
         if (score < 0) score = 0;
         scoreText.setText('Score: ' + score);
-        item.destroy(); // Remove o item após coletar, mas o jogo continua!
+        item.destroy();
     });
 }
 
