@@ -58,10 +58,14 @@ function create() {
         item.destroy();
 
         if (estado.placar[estado.personagem] % 100 === 0) dificuldade += 20;
-        
+
+        // Lógica de Vitória
         let meta = (nomeDificuldade === 'Fácil') ? 500 : (nomeDificuldade === 'Médio' ? 1000 : 2000);
-        if (estado.placar[estado.personagem] >= meta) vitoria(this);
-        if (estado.placar[estado.personagem] % 500 === 0) dispararFogos(this, player.x, player.y);
+        if (estado.placar[estado.personagem] >= meta) {
+            vitoria(this);
+        } else if (estado.placar[estado.personagem] % 500 === 0) {
+            dispararFogos(this, player.x, player.y);
+        }
     });
 
     this.input.on('pointermove', (p) => { 
@@ -111,11 +115,9 @@ function criarCapa(scene) {
         .setOrigin(0.5).setDepth(20).setInteractive();
 
     btnJogar.on('pointerup', () => { 
-        gameStarted = true; 
-        musica.play(); 
+        gameStarted = true; musica.play(); 
         levelText.setText(`Nível: ${nomeDificuldade}`);
-        background.destroy(); 
-        btnJogar.destroy(); 
+        background.destroy(); btnJogar.destroy(); 
         scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
     });
 }
@@ -171,6 +173,4 @@ function gameOver(scene) {
     gameStarted = false;
     scene.physics.pause();
     scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
-    let btnReset = scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
-    btnReset.on('pointerup', () => location.reload());
-}
+    let btnReset = scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color
