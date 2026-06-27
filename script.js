@@ -58,7 +58,6 @@ function create() {
         item.destroy();
 
         if (estado.placar[estado.personagem] % 100 === 0) dificuldade += 20;
-        
         let meta = (nomeDificuldade === 'Fácil') ? 500 : (nomeDificuldade === 'Médio' ? 1000 : 2000);
         if (estado.placar[estado.personagem] >= meta) vitoria(this);
         if (estado.placar[estado.personagem] % 500 === 0) dispararFogos(this, player.x, player.y);
@@ -90,10 +89,7 @@ function create() {
 function update() {
     if (!gameStarted) return;
     items.children.iterate((item) => {
-        if (item && item.y > 600) {
-            item.destroy();
-            perderVida(this);
-        }
+        if (item && item.y > 600) { item.destroy(); perderVida(this); }
     });
 }
 
@@ -109,8 +105,12 @@ function criarCapa(scene) {
     criarBotaoDif(scene, 80, 480, 'Fácil', 300, 0x90EE90);
     criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xDDDDDD);
     criarBotaoDif(scene, 320, 480, 'Difícil', 600, 0xFFB6C1);
-    let btnJogar = scene.add.text(200, 530, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(11).setInteractive();
-    btnJogar.on('pointerdown', () => { 
+    
+    // Botão Jogar com interatividade garantida
+    let btnJogar = scene.add.text(200, 530, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
+        .setOrigin(0.5).setDepth(20).setInteractive();
+
+    btnJogar.on('pointerup', () => { // Mudado para pointerup para mais precisão em celulares
         gameStarted = true; 
         musica.play(); 
         levelText.setText(`Nível: ${nomeDificuldade}`);
@@ -121,10 +121,11 @@ function criarCapa(scene) {
 }
 
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
-    let btn = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(11).setInteractive();
+    let btn = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000000', fontStyle: 'bold' })
+        .setOrigin(0.5).setDepth(20).setInteractive();
     btn.dificuldadeBtn = true;
     if (texto === 'Fácil') { btn.setStroke('#ffffff', 6); btn.setAlpha(1); } else { btn.setAlpha(0.6); }
-    btn.on('pointerdown', () => {
+    btn.on('pointerup', () => { // Mudado para pointerup
         dificuldade = vel; nomeDificuldade = texto; 
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
@@ -147,12 +148,12 @@ function vitoria(scene) {
     scene.physics.pause();
     scene.add.text(200, 300, 'VOCÊ VENCEU!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
     let btnReset = scene.add.text(200, 400, 'JOGAR DE NOVO', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
-    btnReset.on('pointerdown', () => location.reload());
+    btnReset.on('pointerup', () => location.reload());
 }
 
 function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive()
-        .on('pointerdown', () => {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
+        .on('pointerup', () => { // Mudado para pointerup
             estado.personagem = key;
             player.setTexture(key);
             if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
@@ -165,5 +166,5 @@ function gameOver(scene) {
     scene.physics.pause();
     scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
     let btnReset = scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
-    btnReset.on('pointerdown', () => location.reload());
+    btnReset.on('pointerup', () => location.reload());
 }
