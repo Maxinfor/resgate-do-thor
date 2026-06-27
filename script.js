@@ -58,6 +58,7 @@ function create() {
         item.destroy();
 
         if (estado.placar[estado.personagem] % 100 === 0) dificuldade += 20;
+        
         let meta = (nomeDificuldade === 'Fácil') ? 500 : (nomeDificuldade === 'Médio' ? 1000 : 2000);
         if (estado.placar[estado.personagem] >= meta) vitoria(this);
         if (estado.placar[estado.personagem] % 500 === 0) dispararFogos(this, player.x, player.y);
@@ -106,11 +107,10 @@ function criarCapa(scene) {
     criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xDDDDDD);
     criarBotaoDif(scene, 320, 480, 'Difícil', 600, 0xFFB6C1);
     
-    // Botão Jogar com interatividade garantida
     let btnJogar = scene.add.text(200, 530, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
         .setOrigin(0.5).setDepth(20).setInteractive();
 
-    btnJogar.on('pointerup', () => { // Mudado para pointerup para mais precisão em celulares
+    btnJogar.on('pointerup', () => { 
         gameStarted = true; 
         musica.play(); 
         levelText.setText(`Nível: ${nomeDificuldade}`);
@@ -125,7 +125,7 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
         .setOrigin(0.5).setDepth(20).setInteractive();
     btn.dificuldadeBtn = true;
     if (texto === 'Fácil') { btn.setStroke('#ffffff', 6); btn.setAlpha(1); } else { btn.setAlpha(0.6); }
-    btn.on('pointerup', () => { // Mudado para pointerup
+    btn.on('pointerup', () => { 
         dificuldade = vel; nomeDificuldade = texto; 
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
@@ -146,14 +146,20 @@ function vitoria(scene) {
     if(!gameStarted) return;
     gameStarted = false;
     scene.physics.pause();
-    scene.add.text(200, 300, 'VOCÊ VENCEU!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
-    let btnReset = scene.add.text(200, 400, 'JOGAR DE NOVO', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20);
+    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { 
+        fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' 
+    }).setOrigin(0.5).setDepth(20);
+    
+    let btnReset = scene.add.text(200, 450, 'JOGAR DE NOVO', { 
+        fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 
+    }).setOrigin(0.5).setInteractive().setDepth(20);
+    
     btnReset.on('pointerup', () => location.reload());
 }
 
 function criarBotao(scene, x, y, texto, key) {
     scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
-        .on('pointerup', () => { // Mudado para pointerup
+        .on('pointerup', () => { 
             estado.personagem = key;
             player.setTexture(key);
             if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
