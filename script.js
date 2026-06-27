@@ -13,12 +13,12 @@ let player, items, scoreText, levelText, musica, latido;
 let gameStarted = false;
 let dificuldade = 300; 
 let nomeDificuldade = "Fácil"; 
-let estado = { personagem: 'helo', placar: { helo: 0, liz: 0, thor: 0 } };
+let estado = { personagem: 'helo', placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
     this.load.image('capa', 'capa.jpg');
     this.load.image('helo', 'helo.jpg');
-    this.load.image('liz', 'liz.jpg');
+    this.load.image('lis', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
     this.load.image('agua', 'agua.jpg');
     this.load.image('carne', 'carne.jpg');
@@ -40,20 +40,24 @@ function create() {
     items = this.physics.add.group();
     
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#000', fontStyle: 'bold' }).setDepth(5);
-    // Inicializa com o valor da variável, não fixo
     levelText = this.add.text(20, 50, `Nível: ${nomeDificuldade}`, { fontSize: '18px', fill: '#555', fontStyle: 'bold' }).setDepth(5);
 
     player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
     player.setCollideWorldBounds(true);
 
     criarBotao(this, 100, 550, 'Helo', 'helo');
-    criarBotao(this, 200, 550, 'Liz', 'liz');
+    criarBotao(this, 200, 550, 'Lis', 'lis');
     criarBotao(this, 300, 550, 'Thor', 'thor');
 
     this.physics.add.overlap(player, items, (p, item) => {
         estado.placar[estado.personagem] += 10;
         scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
+
+        // Fogos de artifício a cada 50 objetos (50 * 10 pontos = 500)
+        if (estado.placar[estado.personagem] % 500 === 0) {
+            dispararFogos(this, player.x, player.y);
+        }
     });
 
     this.input.on('pointermove', (p) => { 
@@ -90,7 +94,7 @@ function criarCapa(scene) {
     let background = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
     
     criarBotaoDif(scene, 80, 480, 'Fácil', 300, 0x90EE90);
-    criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xFFE4B5);
+    criarBotaoDif(scene, 200, 480, 'Médio', 450, 0xDDDDDD);
     criarBotaoDif(scene, 320, 480, 'Difícil', 600, 0xFFB6C1);
 
     let btnJogar = scene.add.text(200, 530, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
@@ -99,7 +103,7 @@ function criarCapa(scene) {
     btnJogar.on('pointerdown', () => { 
         gameStarted = true; 
         musica.play(); 
-        levelText.setText(`Nível: ${nomeDificuldade}`); // Garante a atualização aqui
+        levelText.setText(`Nível: ${nomeDificuldade}`);
         background.destroy(); 
         btnJogar.destroy(); 
         scene.children.list.forEach(c => { if(c.dificuldadeBtn) c.destroy(); });
@@ -124,7 +128,6 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
     btn.on('pointerdown', () => {
         dificuldade = vel;
         nomeDificuldade = texto; 
-        
         scene.children.list.forEach(c => {
             if (c.dificuldadeBtn) {
                 c.setStroke(c === btn ? '#ffffff' : 'none', c === btn ? 6 : 0);
@@ -132,6 +135,21 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
             }
         });
     });
+}
+
+function dispararFogos(scene, x, y) {
+    let particles = scene.add.particles('helo'); 
+    let emitter = particles.createEmitter({
+        x: x, y: y,
+        speed: { min: -300, max: 300 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.8, end: 0 },
+        blendMode: 'ADD',
+        lifespan: 800,
+        quantity: 30,
+        tint: [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]
+    });
+    scene.time.delayedCall(800, () => particles.destroy());
 }
 
 function criarBotao(scene, x, y, texto, key) {
