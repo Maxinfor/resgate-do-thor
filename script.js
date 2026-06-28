@@ -20,8 +20,8 @@ function preload() {
     this.load.image('fundoThor', 'casa.jpg');
     this.load.image('fundoMeninas', 'quarto.jpg');
     
-    // Personagens (helo.jpg confirmada como jpg, lis e thor como png)
-    this.load.image('helo', 'helo.jpg');
+    // Personagens (helo.png confirmada como png, lis e thor como png)
+    this.load.image('helo', 'helo.png');
     this.load.image('lis', 'lis.png');
     this.load.image('thor', 'thor.png');
     
