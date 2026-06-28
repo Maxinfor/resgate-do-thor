@@ -98,12 +98,12 @@ function perderVida(scene) {
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
     
-    // Botões de dificuldade subiram para 400
+    // Botões de dificuldade em y: 400
     let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300, 0x90EE90);
     let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450, 0xDDDDDD);
     let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600, 0xFFB6C1);
     
-    // Botão Jogar subiu para 450
+    // Botão Jogar em y: 450
     let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
         .setOrigin(0.5).setDepth(20).setInteractive();
 
@@ -128,16 +128,7 @@ function vitoria(scene) {
 }
 
 function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
+        .setOrigin(0.5).setInteractive().setDepth(15)
         .on('pointerup', () => { 
-            estado.personagem = key; player.setTexture(key);
-            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
-        });
-}
-
-function gameOver(scene) {
-    if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
-    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
-}
+            estado.
