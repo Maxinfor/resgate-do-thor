@@ -98,12 +98,12 @@ function perderVida(scene) {
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
     
-    // Botões de dificuldade subiram para 400
+    // Botões de dificuldade ajustados para y: 400
     let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300, 0x90EE90);
     let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450, 0xDDDDDD);
     let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600, 0xFFB6C1);
     
-    // Botão Jogar subiu para 450
+    // Botão Jogar ajustado para y: 450
     let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
         .setOrigin(0.5).setDepth(20).setInteractive();
 
@@ -122,22 +122,17 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
 function vitoria(scene) {
     if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
-}
+    gameStarted = false; 
+    scene.physics.pause();
+    
+    // Fogos no Depth 15
+    let p = scene.add.particles('helo'); 
+    p.setDepth(15);
+    p.createEmitter({ 
+        x: { min: 50, max: 350 }, y: { min: 100, max: 500 }, speed: 150, 
+        scale: { start: 0.8, end: 0 }, lifespan: 2000, quantity: 40, blendMode: 'ADD' 
+    });
 
-function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
-        .on('pointerup', () => { 
-            estado.personagem = key; player.setTexture(key);
-            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
-        });
-}
-
-function gameOver(scene) {
-    if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
-    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
-}
+    // Texto e botão no Depth 30 (topo)
+    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { 
+        fontSize: '40px', fill: '#008000', font
