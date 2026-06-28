@@ -19,17 +19,21 @@ function preload() {
     this.load.image('capa', 'capa.jpg');
     this.load.image('fundoThor', 'casa.jpg');
     this.load.image('fundoMeninas', 'quarto.jpg');
-    this.load.image('helo', 'helo.jpg');
-    this.load.image('lis', 'liz.jpg');
-    this.load.image('thor', 'thor.jpg');
-    this.load.image('agua', 'agua.jpg');
-    this.load.image('carne', 'carne.jpg');
-    this.load.image('osso', 'osso.jpg');
-    this.load.image('secador', 'secador.jpg');
-    this.load.image('escova', 'escova.jpg');
-    this.load.image('oculos', 'oculos.jpg');
-    this.load.image('tenis1', 'tenis1.jpg');
-    this.load.image('tenis2', 'tenis2.jpg');
+    
+    // Personagens
+    this.load.image('helo', 'helo.png');
+    this.load.image('lis', 'lis.png');
+    this.load.image('thor', 'thor.png');
+    
+    // Itens
+    this.load.image('agua', 'agua.png'); 
+    this.load.image('carne', 'carne.png');
+    this.load.image('osso', 'osso.png');
+    this.load.image('secador', 'secador.png');
+    this.load.image('escova', 'escova.png');
+    this.load.image('oculos', 'amigos.png'); // Mapeado para amigos.png
+    this.load.image('tenis1', 'tenis1.png');
+    this.load.image('tenis2', 'tenis2.png');
     this.load.image('meninas', 'meninas.png');
     this.load.image('agenda', 'agenda.png');
     this.load.image('caderno', 'caderno.png');
@@ -42,15 +46,15 @@ function preload() {
     this.load.image('mochila2', 'mochila2.png');
     this.load.image('mochila3', 'mochila3.png');
     this.load.image('lanche', 'lanche.png');
+    
+    // Áudio
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
     this.load.audio('fogos', 'Fogo.mp3');
 }
 
 function create() {
-    // Fundo na camada 0
     fundo = this.add.image(200, 300, 'fundoMeninas').setDisplaySize(400, 600).setDepth(0);
-    // Overlay leve para leitura do texto
     this.add.rectangle(200, 300, 400, 600, 0x000000, 0.2).setDepth(1);
 
     musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
@@ -127,7 +131,6 @@ function criarBotao(scene, x, y, texto, key) {
     scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
         .on('pointerup', () => { 
             estado.personagem = key; player.setTexture(key);
-            // Troca de fundo e som
             if (key === 'thor') {
                 fundo.setTexture('fundoThor');
                 musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500);
