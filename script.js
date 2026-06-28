@@ -1,4 +1,3 @@
-// Configuração do Jogo
 const config = {
     type: Phaser.AUTO,
     width: 400,
@@ -18,11 +17,13 @@ let nomeDificuldade = "Fácil";
 let estado = { personagem: 'helo', placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
+    // Se algo não aparecer, olhe o Console (F12)
+    this.load.on('loaderror', (file) => console.log('Erro ao carregar: ' + file.src));
+    
     this.load.image('capa', 'capa.jpg');
     this.load.image('helo', 'helo.jpg');
     this.load.image('lis', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
-    
     this.load.image('agua', 'agua.jpg');
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
@@ -31,7 +32,6 @@ function preload() {
     this.load.image('oculos', 'oculos.jpg');
     this.load.image('tenis1', 'tenis1.jpg');
     this.load.image('tenis2', 'tenis2.jpg');
-
     this.load.image('meninas', 'meninas.png');
     this.load.image('agenda', 'agenda.png');
     this.load.image('caderno', 'caderno.png');
@@ -44,7 +44,6 @@ function preload() {
     this.load.image('mochila2', 'mochila2.png');
     this.load.image('mochila3', 'mochila3.png');
     this.load.image('lanche', 'lanche.png');
-
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
     this.load.audio('fogos', 'Fogo.mp3');
@@ -80,19 +79,12 @@ function create() {
     this.time.addEvent({
         delay: 800, callback: () => {
             if(!gameStarted || items.countActive() > 10) return;
-            
             let itensThor = ['agua', 'carne', 'osso'];
             let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
-            
             let tipos = (estado.personagem === 'thor') ? itensThor.concat(itensGeral) : itensGeral;
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
-            
-            let isGold = Phaser.Math.Between(1, 10) === 1;
             let item = items.create(Phaser.Math.Between(50, 350), -50, key);
-            item.setDisplaySize(80, 80);
-            item.setVelocityY(dificuldade);
-            item.isGold = isGold;
-            if (isGold) item.setTint(0xFFD700);
+            item.setDisplaySize(80, 80).setVelocityY(dificuldade);
         }, loop: true
     });
 
@@ -102,45 +94,27 @@ function create() {
     criarCapa(this);
 }
 
-function update() {
-    if (!gameStarted) return;
-    items.children.iterate((item) => {
-        if (item && item.y > 600) { item.destroy(); perderVida(this); }
-    });
-}
-
-function perderVida(scene) {
-    vidas--;
-    livesText.setText(`VIDAS: ${"❤️".repeat(vidas)}`);
-    if (vidas <= 0) gameOver(scene);
-}
+function update() {}
 
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
-    
-    // Botões robustos de volta
     let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300, 0x90EE90);
     let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450, 0xDDDDDD);
     let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600, 0xFFB6C1);
-    
     let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(20).setInteractive();
-
-    btnJogar.on('pointerup', () => { 
-        gameStarted = true; musica.play(); levelText.setText(`Nível: ${nomeDificuldade}`);
-        bg.destroy(); btnJogar.destroy(); [btnF, btnM, btnD].forEach(b => b.destroy());
-    });
+    btnJogar.on('pointerup', () => { gameStarted = true; musica.play(); bg.destroy(); btnJogar.destroy(); [btnF, btnM, btnD].forEach(b => b.destroy()); });
 }
 
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
     let b = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20).setInteractive();
-    b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; });
+    b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; levelText.setText(`Nível: ${nomeDificuldade}`); });
     return b;
 }
 
-function vitoria(scene) {
-    if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.sound.play('fogos'); 
-    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
+function criarBotao(scene, x, y, texto, key) {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
+        .on('pointerup', () => { estado.personagem = key; player.setTexture(key); });
 }
+
+function vitoria(scene) { gameStarted = false; scene.physics.pause(); scene.add.text(200, 300, 'VOCÊ VENCEU!', { fontSize: '40px', fill: '#008000' }).setOrigin(0.5).setDepth(20); }
+function gameOver(scene) { gameStarted = false; scene.physics.pause(); scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000' }).setOrigin(0.5).setDepth(20); }
