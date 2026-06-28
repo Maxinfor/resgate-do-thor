@@ -1,3 +1,4 @@
+// Configuração do Jogo
 const config = {
     type: Phaser.AUTO,
     width: 400,
@@ -17,10 +18,13 @@ let nomeDificuldade = "Fácil";
 let estado = { personagem: 'helo', placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
+    // Personagens e Capa
     this.load.image('capa', 'capa.jpg');
     this.load.image('helo', 'helo.jpg');
     this.load.image('lis', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
+    
+    // Itens Fácil
     this.load.image('agua', 'agua.jpg');
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
@@ -29,9 +33,24 @@ function preload() {
     this.load.image('oculos', 'oculos.jpg');
     this.load.image('tenis1', 'tenis1.jpg');
     this.load.image('tenis2', 'tenis2.jpg');
+
+    // Novos Itens (Médio/Difícil)
+    this.load.image('meninas', 'meninas.png');
+    this.load.image('agenda', 'agenda.png');
+    this.load.image('caderno', 'caderno.png');
+    this.load.image('estojo', 'estojo.png');
+    this.load.image('garrafa', 'garrafa.png');
+    this.load.image('kit', 'kit.png');
+    this.load.image('lapis', 'lapis.png');
+    this.load.image('livro', 'livro.png');
+    this.load.image('mochila1', 'mochila1.png');
+    this.load.image('mochila2', 'mochila2.png');
+    this.load.image('mochila3', 'mochila3.png');
+    this.load.image('lanche', 'lanche.png');
+
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
-    this.load.audio('fogos', 'Fogo.mp3'); // <--- Carregando seu arquivo
+    this.load.audio('fogos', 'Fogo.mp3');
 }
 
 function create() {
@@ -64,8 +83,13 @@ function create() {
     this.time.addEvent({
         delay: 800, callback: () => {
             if(!gameStarted || items.countActive() > 10) return;
-            let tipos = (estado.personagem === 'thor') ? ['osso', 'carne', 'agua'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
+            
+            let itensFacil = ['agua', 'carne', 'osso', 'secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
+            let itensMedioDif = ['meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            
+            let tipos = (nomeDificuldade === 'Fácil') ? itensFacil : itensFacil.concat(itensMedioDif);
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
+            
             let isGold = Phaser.Math.Between(1, 10) === 1;
             let item = items.create(Phaser.Math.Between(50, 350), -50, key);
             item.setDisplaySize(80, 80);
@@ -115,12 +139,8 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
 function vitoria(scene) {
     if(!gameStarted) return;
-    gameStarted = false; 
-    scene.physics.pause();
-    
-    // Toca o som de fogos ao vencer
+    gameStarted = false; scene.physics.pause();
     scene.sound.play('fogos'); 
-    
     scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
     scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
 }
