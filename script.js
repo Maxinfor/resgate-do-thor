@@ -35,7 +35,7 @@ function preload() {
     this.load.image('tenis2', 'tenis2.jpg');
 
     // Novos Itens
-    this.load.image('meninas', 'meninas.png');
+    this.load.image('amigos', 'amigos.png');
     this.load.image('agenda', 'agenda.png');
     this.load.image('caderno', 'caderno.png');
     this.load.image('estojo', 'estojo.png');
@@ -85,7 +85,7 @@ function create() {
             if(!gameStarted || items.countActive() > 10) return;
             
             let itensThor = ['agua', 'carne', 'osso'];
-            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'amigos', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
             
             // Lógica corrigida:
             // Se for Thor, tipos recebe APENAS itensThor
