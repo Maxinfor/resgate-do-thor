@@ -51,7 +51,9 @@ function create() {
         estado.placar[estado.personagem] += pontos;
         scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
+
         if (estado.placar[estado.personagem] % 100 === 0) dificuldade += 20;
+
         let meta = (nomeDificuldade === 'Fácil') ? 500 : (nomeDificuldade === 'Médio' ? 1000 : 2000);
         if (estado.placar[estado.personagem] >= meta) vitoria(this);
     });
