@@ -80,24 +80,20 @@ function create() {
         if(p.isDown && gameStarted) player.x = Math.round(Phaser.Math.Clamp(p.x, 60, 340));
     });
 
-    this.time.addEvent({
+        this.time.addEvent({
         delay: 800, callback: () => {
             if(!gameStarted || items.countActive() > 10) return;
             
             let itensThor = ['agua', 'carne', 'osso'];
-            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
-            let itensExtra = ['meninas']; 
+            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
             
-            let tipos;
-            if (estado.personagem === 'thor') {
-                tipos = itensThor.concat(itensGeral);
-            } else {
-                tipos = itensGeral;
-            }
+            // Lógica corrigida:
+            // Se for Thor, tipos recebe APENAS itensThor
+            // Se não for Thor, tipos recebe APENAS itensGeral
+            let tipos = (estado.personagem === 'thor') ? itensThor : itensGeral;
             
-            if (nomeDificuldade !== 'Fácil') tipos = tipos.concat(itensExtra);
-
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
+            
             let isGold = Phaser.Math.Between(1, 10) === 1;
             let item = items.create(Phaser.Math.Between(50, 350), -50, key);
             item.setDisplaySize(80, 80);
@@ -106,6 +102,7 @@ function create() {
             if (isGold) item.setTint(0xFFD700);
         }, loop: true
     });
+
 
     criarBotao(this, 100, 550, 'Helo', 'helo');
     criarBotao(this, 200, 550, 'Lis', 'lis');
