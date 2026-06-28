@@ -31,10 +31,10 @@ function preload() {
     this.load.image('osso', 'osso.png');
     this.load.image('secador', 'secador.png');
     this.load.image('escova', 'escova.png');
-    this.load.image('oculos', 'amigos.png'); 
+    this.load.image('oculos', 'oculos.png'); 
     this.load.image('tenis1', 'tenis1.png');
     this.load.image('tenis2', 'tenis2.png');
-    this.load.image('meninas', 'meninas.png');
+    this.load.image('amigos', 'amigos.png');
     this.load.image('agenda', 'agenda.png');
     this.load.image('caderno', 'caderno.png');
     this.load.image('estojo', 'estojo.png');
@@ -90,7 +90,7 @@ function create() {
         delay: 800, callback: () => {
             if(!gameStarted || items.countActive() > 10) return;
             let itensThor = ['agua', 'carne', 'osso'];
-            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'amigos', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
             let tipos = (estado.personagem === 'thor') ? itensThor : itensGeral;
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
             let isGold = Phaser.Math.Between(1, 10) === 1;
