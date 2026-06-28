@@ -17,6 +17,7 @@ let nomeDificuldade = "Fácil";
 let estado = { personagem: 'helo', placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
+function preload() {
     this.load.image('capa', 'capa.jpg');
     this.load.image('helo', 'helo.jpg');
     this.load.image('lis', 'liz.jpg');
@@ -31,8 +32,12 @@ function preload() {
     this.load.image('tenis2', 'tenis2.jpg');
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
-    this.load.audio('fogos', 'Fogo.mp3'); // <--- Carregando seu arquivo
+    this.load.audio('fogos', 'Fogo.mp3');
+    
+    // Linha corrigida para carregar a sua imagem de fogos:
+    this.load.image('fogos2', 'fogos2.jpg'); 
 }
+
 
 function create() {
     this.cameras.main.setBackgroundColor('#ffffff');
