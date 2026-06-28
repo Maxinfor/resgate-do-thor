@@ -97,10 +97,15 @@ function perderVida(scene) {
 
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
+    
+    // Botões de dificuldade subiram para 400
     let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300, 0x90EE90);
     let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450, 0xDDDDDD);
     let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600, 0xFFB6C1);
-    let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(20).setInteractive();
+    
+    // Botão Jogar subiu para 450
+    let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 })
+        .setOrigin(0.5).setDepth(20).setInteractive();
 
     btnJogar.on('pointerup', () => { 
         gameStarted = true; musica.play(); levelText.setText(`Nível: ${nomeDificuldade}`);
@@ -109,7 +114,8 @@ function criarCapa(scene) {
 }
 
 function criarBotaoDif(scene, x, y, texto, vel, cor) {
-    let b = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20).setInteractive();
+    let b = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000', fontStyle: 'bold' })
+        .setOrigin(0.5).setDepth(20).setInteractive();
     b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; });
     return b;
 }
