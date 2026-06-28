@@ -20,12 +20,11 @@ function preload() {
     this.load.image('fundoThor', 'casa.jpg');
     this.load.image('fundoMeninas', 'quarto.jpg');
     
-    // Personagens (helo.png confirmada como png, lis e thor como png)
-    this.load.image('helo', 'helo.png');
+    // Ajuste de extensões conforme sua lista atualizada
+    this.load.image('helo', 'helo.png'); 
     this.load.image('lis', 'lis.png');
     this.load.image('thor', 'thor.png');
     
-    // Itens
     this.load.image('agua', 'agua.png'); 
     this.load.image('carne', 'carne.png');
     this.load.image('osso', 'osso.png');
@@ -63,11 +62,10 @@ function create() {
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#fff', fontStyle: 'bold' }).setDepth(5);
     livesText = this.add.text(380, 20, 'VIDAS: ❤️❤️❤️', { fontSize: '20px', fill: '#ff0000' }).setOrigin(1, 0).setDepth(5);
 
-    // Personagem e moldura achatada
+    // Moldura e player inicializados corretamente
     moldura = this.add.ellipse(200, 450, 110, 90, 0xffffff).setStrokeStyle(4, 0x000000).setDepth(3);
-    player = this.physics.add.sprite(200, 450, estado.personagem);
-    player.setDisplaySize(100, 80); 
-    player.setCollideWorldBounds(true).setDepth(4);
+    player = this.physics.add.sprite(200, 450, estado.personagem).setDisplaySize(100, 80).setDepth(4);
+    player.setCollideWorldBounds(true);
 
     this.physics.add.overlap(player, items, (p, item) => {
         let pontos = item.isGold ? 60 : 10;
@@ -138,7 +136,7 @@ function criarBotao(scene, x, y, texto, key) {
         .on('pointerup', () => { 
             estado.personagem = key; 
             player.setTexture(key);
-            player.setDisplaySize(100, 80); // Garante o tamanho achatado
+            player.setDisplaySize(100, 80); 
             if (key === 'thor') {
                 fundo.setTexture('fundoThor');
                 musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500);
