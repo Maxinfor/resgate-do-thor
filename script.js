@@ -31,6 +31,7 @@ function preload() {
     this.load.image('tenis2', 'tenis2.jpg');
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
+    this.load.audio('fogos', 'Fogo.mp3'); // <--- Carregando seu arquivo
 }
 
 function create() {
@@ -114,7 +115,12 @@ function criarBotaoDif(scene, x, y, texto, vel, cor) {
 
 function vitoria(scene) {
     if(!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
+    gameStarted = false; 
+    scene.physics.pause();
+    
+    // Toca o som de fogos ao vencer
+    scene.sound.play('fogos'); 
+    
     scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
     scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
 }
