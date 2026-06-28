@@ -24,7 +24,7 @@ function preload() {
     this.load.image('lis', 'liz.jpg');
     this.load.image('thor', 'thor.jpg');
     
-    // Itens Fácil
+    // Itens Base
     this.load.image('agua', 'agua.jpg');
     this.load.image('carne', 'carne.jpg');
     this.load.image('osso', 'osso.jpg');
@@ -34,7 +34,7 @@ function preload() {
     this.load.image('tenis1', 'tenis1.jpg');
     this.load.image('tenis2', 'tenis2.jpg');
 
-    // Novos Itens (Médio/Difícil)
+    // Novos Itens
     this.load.image('meninas', 'meninas.png');
     this.load.image('agenda', 'agenda.png');
     this.load.image('caderno', 'caderno.png');
@@ -84,12 +84,20 @@ function create() {
         delay: 800, callback: () => {
             if(!gameStarted || items.countActive() > 10) return;
             
-            let itensFacil = ['agua', 'carne', 'osso', 'secador', 'escova', 'oculos', 'tenis1', 'tenis2'];
-            let itensMedioDif = ['meninas', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            let itensThor = ['agua', 'carne', 'osso'];
+            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            let itensExtra = ['meninas']; 
             
-            let tipos = (nomeDificuldade === 'Fácil') ? itensFacil : itensFacil.concat(itensMedioDif);
+            let tipos;
+            if (estado.personagem === 'thor') {
+                tipos = itensThor.concat(itensGeral);
+            } else {
+                tipos = itensGeral;
+            }
+            
+            if (nomeDificuldade !== 'Fácil') tipos = tipos.concat(itensExtra);
+
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
-            
             let isGold = Phaser.Math.Between(1, 10) === 1;
             let item = items.create(Phaser.Math.Between(50, 350), -50, key);
             item.setDisplaySize(80, 80);
