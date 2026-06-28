@@ -9,7 +9,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-let player, items, scoreText, livesText, musica, latido, fundo;
+let player, moldura, items, scoreText, livesText, musica, latido, fundo;
 let gameStarted = false;
 let vidas = 3;
 let dificuldade = 300; 
@@ -20,8 +20,8 @@ function preload() {
     this.load.image('fundoThor', 'casa.jpg');
     this.load.image('fundoMeninas', 'quarto.jpg');
     
-    // Personagens
-    this.load.image('helo', 'helo.png');
+    // Personagens (helo.jpg confirmada como jpg, lis e thor como png)
+    this.load.image('helo', 'helo.jpg');
     this.load.image('lis', 'lis.png');
     this.load.image('thor', 'thor.png');
     
@@ -31,7 +31,7 @@ function preload() {
     this.load.image('osso', 'osso.png');
     this.load.image('secador', 'secador.png');
     this.load.image('escova', 'escova.png');
-    this.load.image('oculos', 'amigos.png'); // Mapeado para amigos.png
+    this.load.image('oculos', 'amigos.png'); 
     this.load.image('tenis1', 'tenis1.png');
     this.load.image('tenis2', 'tenis2.png');
     this.load.image('meninas', 'meninas.png');
@@ -47,7 +47,6 @@ function preload() {
     this.load.image('mochila3', 'mochila3.png');
     this.load.image('lanche', 'lanche.png');
     
-    // Áudio
     this.load.audio('trilha', 'musica.mp3'); 
     this.load.audio('latido', 'latido.mp3');
     this.load.audio('fogos', 'Fogo.mp3');
@@ -64,8 +63,11 @@ function create() {
     scoreText = this.add.text(20, 20, 'SCORE: 0', { fontSize: '24px', fill: '#fff', fontStyle: 'bold' }).setDepth(5);
     livesText = this.add.text(380, 20, 'VIDAS: ❤️❤️❤️', { fontSize: '20px', fill: '#ff0000' }).setOrigin(1, 0).setDepth(5);
 
-    player = this.physics.add.sprite(200, 400, estado.personagem).setDisplaySize(120, 120);
-    player.setCollideWorldBounds(true);
+    // Personagem e moldura achatada
+    moldura = this.add.ellipse(200, 450, 110, 90, 0xffffff).setStrokeStyle(4, 0x000000).setDepth(3);
+    player = this.physics.add.sprite(200, 450, estado.personagem);
+    player.setDisplaySize(100, 80); 
+    player.setCollideWorldBounds(true).setDepth(4);
 
     this.physics.add.overlap(player, items, (p, item) => {
         let pontos = item.isGold ? 60 : 10;
@@ -77,7 +79,11 @@ function create() {
     });
 
     this.input.on('pointermove', (p) => { 
-        if(p.isDown && gameStarted) player.x = Math.round(Phaser.Math.Clamp(p.x, 60, 340));
+        if(p.isDown && gameStarted) {
+            let posX = Phaser.Math.Clamp(p.x, 60, 340);
+            player.x = posX;
+            moldura.x = posX;
+        }
     });
 
     this.time.addEvent({
@@ -130,7 +136,9 @@ function vitoria(scene) {
 function criarBotao(scene, x, y, texto, key) {
     scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
         .on('pointerup', () => { 
-            estado.personagem = key; player.setTexture(key);
+            estado.personagem = key; 
+            player.setTexture(key);
+            player.setDisplaySize(100, 80); // Garante o tamanho achatado
             if (key === 'thor') {
                 fundo.setTexture('fundoThor');
                 musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500);
