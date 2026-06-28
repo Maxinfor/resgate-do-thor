@@ -76,9 +76,11 @@ function create() {
         }, loop: true
     });
 
-    criarBotao(this, 100, 550, 'Helo', 'helo');
-    criarBotao(this, 200, 550, 'Lis', 'lis');
-    criarBotao(this, 300, 550, 'Thor', 'thor');
+    // Criação dos botões da interface inicial
+    this.listaBotoes = [];
+    this.listaBotoes.push(criarBotao(this, 100, 550, 'Helo', 'helo'));
+    this.listaBotoes.push(criarBotao(this, 200, 550, 'Lis', 'lis'));
+    this.listaBotoes.push(criarBotao(this, 300, 550, 'Thor', 'thor'));
     criarCapa(this);
 }
 
@@ -91,4 +93,56 @@ function update() {
 
 function perderVida(scene) {
     vidas--;
-    lives
+    livesText.setText(`VIDAS: ${"❤️".repeat(vidas)}`);
+    if (vidas <= 0) gameOver(scene);
+}
+
+function criarCapa(scene) {
+    scene.bgCapa = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(9);
+    
+    scene.btnJogar = scene.add.text(200, 100, 'JOGAR', { fontSize: '40px', backgroundColor: '#000', color: '#fff', padding: 20 })
+        .setOrigin(0.5).setDepth(20).setInteractive();
+
+    scene.btnF = criarBotaoDif(scene, 80, 200, 'Fácil', 300, 0x90EE90);
+    scene.btnM = criarBotaoDif(scene, 200, 200, 'Médio', 450, 0xDDDDDD);
+    scene.btnD = criarBotaoDif(scene, 320, 200, 'Difícil', 600, 0xFFB6C1);
+    
+    scene.btnJogar.on('pointerup', () => { 
+        gameStarted = true; musica.play(); levelText.setText(`Nível: ${nomeDificuldade}`);
+        scene.bgCapa.destroy(); scene.btnJogar.destroy(); 
+        scene.btnF.destroy(); scene.btnM.destroy(); scene.btnD.destroy();
+    });
+}
+
+function criarBotaoDif(scene, x, y, texto, vel, cor) {
+    let b = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000', fontStyle: 'bold' })
+        .setOrigin(0.5).setDepth(20).setInteractive();
+    b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; });
+    return b;
+}
+
+function vitoria(scene) {
+    if(!gameStarted) return;
+    gameStarted = false; scene.physics.pause();
+    let p = scene.add.particles('helo'); p.setDepth(20);
+    p.createEmitter({ x: { min: 50, max: 350 }, y: { min: 100, max: 500 }, speed: 150, scale: { start: 0.8, end: 0 }, lifespan: 2000, quantity: 40, blendMode: 'ADD' });
+    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center', stroke: '#ffffff', strokeThickness: 6 }).setOrigin(0.5).setDepth(30);
+    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
+}
+
+function criarBotao(scene, x, y, texto, key) {
+    let b = scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' })
+        .setOrigin(0.5).setInteractive().setDepth(15)
+        .on('pointerup', () => { 
+            estado.personagem = key; player.setTexture(key);
+            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+        });
+    return b;
+}
+
+function gameOver(scene) {
+    if(!gameStarted) return;
+    gameStarted = false; scene.physics.pause();
+    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20);
+    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
+}
