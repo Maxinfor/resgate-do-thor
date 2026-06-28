@@ -118,12 +118,36 @@ function vitoria(scene) {
     gameStarted = false; 
     scene.physics.pause();
     
-    // Toca o som de fogos ao vencer
-    scene.sound.play('fogos'); 
+    // 1. Criamos uma textura simples de "partícula" na hora
+    let graphics = scene.make.graphics({ x: 0, y: 0, add: false });
+    graphics.fillStyle(0xffffff); // Cor branca
+    graphics.fillRect(0, 0, 8, 8); // Quadrado pequeno
+    graphics.generateTexture('particula', 8, 8);
+
+    // 2. Usamos essa textura 'particula' para o efeito
+    let particles = scene.add.particles(200, 300, 'particula', {
+        speed: { min: 100, max: 300 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 1, end: 0 },
+        blendMode: 'ADD',
+        lifespan: 1500,
+        quantity: 100, // Aumentei a quantidade para você ver bem
+        emitting: true
+    });
+
+    // Toca o som
+    scene.sound.play('fogos');
     
-    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { fontSize: '40px', fill: '#008000', fontStyle: 'bold', align: 'center' }).setOrigin(0.5).setDepth(20);
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(20).on('pointerup', () => location.reload());
+    // Texto
+    scene.add.text(200, 300, 'VOCÊ VENCEU!\nPARABÉNS!', { 
+        fontSize: '40px', fill: '#FFD700', fontStyle: 'bold', align: 'center', stroke: '#000', strokeThickness: 6 
+    }).setOrigin(0.5).setDepth(30);
+    
+    scene.add.text(200, 450, 'REINICIAR', { 
+        fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 
+    }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
 }
+
 
 function criarBotao(scene, x, y, texto, key) {
     scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
