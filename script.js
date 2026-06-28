@@ -88,13 +88,10 @@ function create() {
             let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
             let itensExtra = ['meninas']; 
             
-            let tipos;
-            if (estado.personagem === 'thor') {
-                tipos = itensThor.concat(itensGeral);
-            } else {
-                tipos = itensGeral;
-            }
+            // Lógica: Se for Thor, usa itensThor + itensGeral. Se não, apenas itensGeral.
+            let tipos = (estado.personagem === 'thor') ? itensThor.concat(itensGeral) : itensGeral;
             
+            // Adiciona extra se não for modo Fácil
             if (nomeDificuldade !== 'Fácil') tipos = tipos.concat(itensExtra);
 
             let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
@@ -128,9 +125,9 @@ function perderVida(scene) {
 
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(10);
-    let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300, 0x90EE90);
-    let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450, 0xDDDDDD);
-    let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600, 0xFFB6C1);
+    let btnF = criarBotaoDif(scene, 80, 400, 'Fácil', 300);
+    let btnM = criarBotaoDif(scene, 200, 400, 'Médio', 450);
+    let btnD = criarBotaoDif(scene, 320, 400, 'Difícil', 600);
     let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(20).setInteractive();
 
     btnJogar.on('pointerup', () => { 
@@ -139,9 +136,9 @@ function criarCapa(scene) {
     });
 }
 
-function criarBotaoDif(scene, x, y, texto, vel, cor) {
-    let b = scene.add.text(x, y, texto, { backgroundColor: '#' + cor.toString(16).padStart(6, '0'), padding: 10, color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20).setInteractive();
-    b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; });
+function criarBotaoDif(scene, x, y, texto, vel) {
+    let b = scene.add.text(x, y, texto, { fontSize: '20px', fill: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(20).setInteractive();
+    b.on('pointerup', () => { dificuldade = vel; nomeDificuldade = texto; levelText.setText(`Nível: ${nomeDificuldade}`); });
     return b;
 }
 
