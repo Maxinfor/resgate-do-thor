@@ -12,7 +12,7 @@ const game = new Phaser.Game(config);
 let player, items, scoreText, livesText, musica, latido, fundo;
 let gameStarted = false;
 let vidas = 3;
-let nivel = ''; 
+let nivel = '';
 let dificuldade = 300;
 let estado = { personagem: "helo", placar: { helo: 0, lis: 0, thor: 0 } };
 
@@ -53,7 +53,7 @@ function create() {
         scoreText.setText(`SCORE: ${score}`);
         item.destroy();
 
-        // Regras de Negócio por Nível
+        // Lógica de Negocio
         if (nivel === 'facil' && score >= 500) vitoria(this, "PARABÉNS! VOCÊ VENCEU!");
         else if (nivel === 'medio') {
             if (score >= 500) dificuldade = 500;
@@ -85,11 +85,11 @@ function create() {
 
 function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(20);
-    let txt = scene.add.text(200, 200, 'ESCOLHA O NÍVEL:', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(21);
+    let txt = scene.add.text(200, 150, 'ESCOLHA O NÍVEL:', { fontSize: '28px', color: '#fff', backgroundColor: '#000', padding: 10 }).setOrigin(0.5).setDepth(21);
     
-    let btnF = scene.add.text(200, 280, 'FÁCIL', { backgroundColor: '#2ecc71', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
-    let btnM = scene.add.text(200, 360, 'MÉDIO', { backgroundColor: '#f1c40f', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
-    let btnD = scene.add.text(200, 440, 'DIFÍCIL', { backgroundColor: '#e74c3c', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
+    let btnF = scene.add.text(200, 250, 'FÁCIL', { fontSize: '24px', backgroundColor: '#2ecc71', color: '#000', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
+    let btnM = scene.add.text(200, 350, 'MÉDIO', { fontSize: '24px', backgroundColor: '#f1c40f', color: '#000', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
+    let btnD = scene.add.text(200, 450, 'DIFÍCIL', { fontSize: '24px', backgroundColor: '#e74c3c', color: '#fff', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
 
     btnF.on('pointerup', () => iniciarJogo(scene, 'facil', 300, bg, [txt, btnF, btnM, btnD]));
     btnM.on('pointerup', () => iniciarJogo(scene, 'medio', 400, bg, [txt, btnF, btnM, btnD]));
@@ -98,43 +98,4 @@ function criarCapa(scene) {
 
 function iniciarJogo(scene, n, vel, bg, elementos) {
     nivel = n; dificuldade = vel; gameStarted = true; musica.play();
-    bg.destroy(); elementos.forEach(e => e.destroy());
-}
-
-function update() {
-    if (!gameStarted) return;
-    items.children.iterate((item) => {
-        if (item && item.y > 600) { item.destroy(); perderVida(this); }
-    });
-}
-
-function perderVida(scene) {
-    vidas--;
-    livesText.setText(`VIDAS: ${"❤️".repeat(vidas)}`);
-    if (vidas <= 0) gameOver(scene);
-}
-
-function vitoria(scene, mensagem) {
-    if (!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.sound.play('fogos');
-    scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.7).setDepth(20);
-    scene.add.text(200, 300, mensagem, { fontSize: '32px', fill: '#00FF00', fontStyle: 'bold', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5).setDepth(21);
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(21).on('pointerup', () => location.reload());
-}
-
-function gameOver(scene) {
-    gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(30);
-    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
-}
-
-function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
-        .on('pointerup', () => {
-            estado.personagem = key;
-            player.setTexture(key);
-            fundo.setTexture(key === 'thor' ? 'fundoThor' : 'fundoMeninas');
-            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
-        });
-}
+    bg
