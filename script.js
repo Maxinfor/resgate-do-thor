@@ -9,11 +9,11 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// Variáveis Globais
 let player, items, scoreText, livesText, musica, latido, fundo;
 let gameStarted = false;
 let vidas = 3;
-let dificuldade = 320;
+let nivel = 'facil'; // Altere para 'medio' ou 'dificil'
+let dificuldade = (nivel === 'facil') ? 300 : (nivel === 'medio' ? 400 : 450);
 let estado = { personagem: "helo", placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
@@ -50,7 +50,6 @@ function preload() {
 
 function create() {
     fundo = this.add.image(200, 300, "fundoMeninas").setDisplaySize(400, 600);
-    
     musica = this.sound.add("trilha", { loop: true, volume: 0.35 });
     latido = this.sound.add("latido", { volume: 0.6 });
     items = this.physics.add.group();
@@ -64,23 +63,28 @@ function create() {
     this.physics.add.overlap(player, items, (p, item) => {
         let pontos = item.isGold ? 60 : 10;
         estado.placar[estado.personagem] += pontos;
-        scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
+        let score = estado.placar[estado.personagem];
+        scoreText.setText(`SCORE: ${score}`);
         item.destroy();
+
+        // Lógica de Dificuldade e Vitória
+        if (nivel === 'facil' && score >= 500) vitoria(this, "PARABÉNS! VOCÊ VENCEU!");
+        else if (nivel === 'medio') {
+            if (score >= 500) dificuldade = 500;
+            if (score >= 1000) vitoria(this, "PARABÉNS! VOCÊ É UM MESTRE!");
+        } else if (nivel === 'dificil') {
+            if (score >= 500) dificuldade = 600;
+            if (score >= 2000) vitoria(this, "PARABÉNS! VOCÊ É UMA LENDA!");
+        }
     });
 
-    this.input.on('pointermove', (p) => {
-        if (p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 50, 350);
-    });
+    this.input.on('pointermove', (p) => { if (p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 50, 350); });
 
-    // Gerador de itens
     this.time.addEvent({
         delay: 800, callback: () => {
             if (!gameStarted || items.countActive() > 10) return;
-            let itensThor = ['agua', 'carne', 'osso'];
-            let itensGeral = ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'amigos', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
-            let tipos = (estado.personagem === 'thor') ? itensThor : itensGeral;
-            let key = tipos[Phaser.Math.Between(0, tipos.length - 1)];
-            let item = items.create(Phaser.Math.Between(50, 350), -50, key);
+            let tipos = (estado.personagem === 'thor') ? ['agua', 'carne', 'osso'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'amigos', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
+            let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, tipos.length - 1)]);
             item.setDisplaySize(70, 70).setVelocityY(dificuldade);
             item.isGold = Phaser.Math.Between(1, 10) === 1;
             if (item.isGold) item.setTint(0xFFD700);
@@ -106,6 +110,21 @@ function perderVida(scene) {
     if (vidas <= 0) gameOver(scene);
 }
 
+function vitoria(scene, mensagem) {
+    if (!gameStarted) return;
+    gameStarted = false; scene.physics.pause();
+    scene.sound.play('fogos');
+    scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.7).setDepth(20);
+    scene.add.text(200, 300, mensagem, { fontSize: '32px', fill: '#00FF00', fontStyle: 'bold', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5).setDepth(21);
+    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(21).on('pointerup', () => location.reload());
+}
+
+function gameOver(scene) {
+    gameStarted = false; scene.physics.pause();
+    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(30);
+    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
+}
+
 function criarBotao(scene, x, y, texto, key) {
     scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
         .on('pointerup', () => {
@@ -120,10 +139,4 @@ function criarCapa(scene) {
     let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(20);
     let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(21).setInteractive();
     btnJogar.on('pointerup', () => { gameStarted = true; musica.play(); bg.destroy(); btnJogar.destroy(); });
-}
-
-function gameOver(scene) {
-    gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(30);
-    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
 }
