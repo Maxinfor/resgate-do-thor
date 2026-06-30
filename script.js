@@ -1,4 +1,4 @@
-       const config = {
+const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
@@ -12,7 +12,7 @@ const game = new Phaser.Game(config);
 let player, items, scoreText, livesText, musica, latido, fundo;
 let gameStarted = false;
 let vidas = 3;
-let nivel = ''; 
+let nivel = '';
 let dificuldade = 300;
 let estado = { personagem: "helo", placar: { helo: 0, lis: 0, thor: 0 } };
 
@@ -49,11 +49,11 @@ function create() {
     this.physics.add.overlap(player, items, (p, item) => {
         let pontos = item.isGold ? 60 : 10;
         estado.placar[estado.personagem] += pontos;
-        let score = estado.placar[estado.personagem];
-        scoreText.setText(`SCORE: ${score}`);
+        scoreText.setText(`SCORE: ${estado.placar[estado.personagem]}`);
         item.destroy();
 
-        // Lógica de Nível e Dificuldade
+        // Regra de Negocio
+        let score = estado.placar[estado.personagem];
         if (nivel === 'facil' && score >= 500) vitoria(this, "PARABÉNS! VOCÊ VENCEU!");
         else if (nivel === 'medio') {
             if (score >= 500) dificuldade = 500;
@@ -66,38 +66,33 @@ function create() {
 
     this.input.on('pointermove', (p) => { if (p.isDown && gameStarted) player.x = Phaser.Math.Clamp(p.x, 50, 350); });
 
-    // GERADOR COM LÓGICA DINÂMICA
     this.time.addEvent({
-        delay: 800, callback: () => {
+        delay: 800, loop: true, callback: () => {
             if (!gameStarted || items.countActive() > 10) return;
-            // A lista é escolhida sempre no momento da criação
             let tipos = (estado.personagem === 'thor') ? ['agua', 'carne', 'osso'] : ['secador', 'escova', 'oculos', 'tenis1', 'tenis2', 'amigos', 'agenda', 'caderno', 'estojo', 'garrafa', 'kit', 'lapis', 'livro', 'mochila1', 'mochila2', 'mochila3', 'lanche'];
             let item = items.create(Phaser.Math.Between(50, 350), -50, tipos[Phaser.Math.Between(0, tipos.length - 1)]);
             item.setDisplaySize(70, 70).setVelocityY(dificuldade);
             item.isGold = Phaser.Math.Between(1, 10) === 1;
             if (item.isGold) item.setTint(0xFFD700);
-        }, loop: true
+        }
     });
 
     criarBotao(this, 100, 550, 'Helo', 'helo');
     criarBotao(this, 200, 550, 'Lis', 'lis');
     criarBotao(this, 300, 550, 'Thor', 'thor');
-    
-    // Mostra a capa com botões de nível
     criarCapa(this);
 }
 
 function criarCapa(scene) {
-    let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(20);
-    let txt = scene.add.text(200, 150, 'ESCOLHA O NÍVEL:', { fontSize: '28px', color: '#fff', backgroundColor: '#000', padding: 10 }).setOrigin(0.5).setDepth(21);
-    
-    let btnF = scene.add.text(200, 250, 'FÁCIL', { fontSize: '24px', backgroundColor: '#2ecc71', color: '#000', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
-    let btnM = scene.add.text(200, 350, 'MÉDIO', { fontSize: '24px', backgroundColor: '#f1c40f', color: '#000', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
-    let btnD = scene.add.text(200, 450, 'DIFÍCIL', { fontSize: '24px', backgroundColor: '#e74c3c', color: '#fff', padding: 15, fixedWidth: 150, align: 'center' }).setOrigin(0.5).setDepth(21).setInteractive();
+    let bg = scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.9).setDepth(20);
+    let txt = scene.add.text(200, 100, 'ESCOLHA O NÍVEL', { fontSize: '30px', color: '#fff' }).setOrigin(0.5).setDepth(30);
+    let btnF = scene.add.text(200, 250, 'FÁCIL', { fontSize: '24px', backgroundColor: '#2ecc71', padding: 15 }).setOrigin(0.5).setDepth(30).setInteractive();
+    let btnM = scene.add.text(200, 350, 'MÉDIO', { fontSize: '24px', backgroundColor: '#f1c40f', padding: 15 }).setOrigin(0.5).setDepth(30).setInteractive();
+    let btnD = scene.add.text(200, 450, 'DIFÍCIL', { fontSize: '24px', backgroundColor: '#e74c3c', padding: 15 }).setOrigin(0.5).setDepth(30).setInteractive();
 
-    btnF.on('pointerup', () => iniciarJogo(scene, 'facil', 300, bg, [txt, btnF, btnM, btnD]));
-    btnM.on('pointerup', () => iniciarJogo(scene, 'medio', 400, bg, [txt, btnF, btnM, btnD]));
-    btnD.on('pointerup', () => iniciarJogo(scene, 'dificil', 450, bg, [txt, btnF, btnM, btnD]));
+    btnF.on('pointerdown', () => iniciarJogo(scene, 'facil', 300, bg, [txt, btnF, btnM, btnD]));
+    btnM.on('pointerdown', () => iniciarJogo(scene, 'medio', 400, bg, [txt, btnF, btnM, btnD]));
+    btnD.on('pointerdown', () => iniciarJogo(scene, 'dificil', 450, bg, [txt, btnF, btnM, btnD]));
 }
 
 function iniciarJogo(scene, n, vel, bg, elementos) {
@@ -118,28 +113,25 @@ function perderVida(scene) {
     if (vidas <= 0) gameOver(scene);
 }
 
-function vitoria(scene, mensagem) {
-    if (!gameStarted) return;
-    gameStarted = false; scene.physics.pause();
-    scene.sound.play('fogos');
-    scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.7).setDepth(20);
-    scene.add.text(200, 300, mensagem, { fontSize: '32px', fill: '#00FF00', fontStyle: 'bold', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5).setDepth(21);
-    scene.add.text(200, 450, 'REINICIAR', { fontSize: '20px', backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(21).on('pointerup', () => location.reload());
+function vitoria(scene, msg) {
+    gameStarted = false; scene.physics.pause(); scene.sound.play('fogos');
+    scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.8).setDepth(40);
+    scene.add.text(200, 300, msg, { fontSize: '25px', color: '#0f0', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5).setDepth(41);
+    scene.add.text(200, 450, 'REINICIAR', { backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setDepth(41).setInteractive().on('pointerdown', () => location.reload());
 }
 
 function gameOver(scene) {
     gameStarted = false; scene.physics.pause();
-    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(30);
-    scene.add.text(200, 400, 'REINICIAR', { fontSize: '20px', backgroundColor: '#000', color: '#fff', padding: 10 }).setOrigin(0.5).setInteractive().setDepth(30).on('pointerup', () => location.reload());
+    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#f00' }).setOrigin(0.5).setDepth(40);
+    scene.add.text(200, 400, 'REINICIAR', { backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setDepth(40).setInteractive().on('pointerdown', () => location.reload());
 }
 
 function criarBotao(scene, x, y, texto, key) {
-    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5, color: '#ffffff' }).setOrigin(0.5).setInteractive().setDepth(15)
-        .on('pointerup', () => {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5 }).setOrigin(0.5).setInteractive().setDepth(15)
+        .on('pointerdown', () => {
             estado.personagem = key;
             player.setTexture(key);
             fundo.setTexture(key === 'thor' ? 'fundoThor' : 'fundoMeninas');
             if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
         });
 }
-     
