@@ -23,7 +23,6 @@ function preload() {
     this.load.image("helo", "helo.png");
     this.load.image("lis", "lis.png");
     this.load.image("thor", "thor.png");
-    // Itens
     this.load.image("agua", "agua.png"); this.load.image("carne", "carne.png"); this.load.image("osso", "osso.png");
     this.load.image("secador", "secador.png"); this.load.image("escova", "escova.png"); this.load.image("oculos", "oculos.png");
     this.load.image("tenis1", "tenis1.png"); this.load.image("tenis2", "tenis2.png"); this.load.image("amigos", "amigos.png");
@@ -80,22 +79,18 @@ function create() {
     criarBotao(this, 200, 550, 'Lis', 'lis');
     criarBotao(this, 300, 550, 'Thor', 'thor');
     
-    // Inicia a capa principal
-    criarCapa(this);
-}
-
-function criarCapa(scene) {
-    let bg = scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.9).setDepth(20);
-    let btnJogar = scene.add.text(200, 300, 'JOGAR', { fontSize: '40px', backgroundColor: '#fff', color: '#000', padding: 20 }).setOrigin(0.5).setDepth(30).setInteractive();
+    // Início da Capa
+    let bgCapa = this.add.rectangle(200, 300, 400, 600, 0x000000, 0.95).setDepth(20);
+    let btnJogar = this.add.text(200, 300, 'JOGAR', { fontSize: '40px', backgroundColor: '#fff', color: '#000', padding: 20 }).setOrigin(0.5).setDepth(30).setInteractive();
     
     btnJogar.on('pointerdown', () => {
-        bg.destroy(); btnJogar.destroy();
-        mostrarSelecaoNivel(scene);
+        bgCapa.destroy(); btnJogar.destroy();
+        mostrarSelecaoNivel(this);
     });
 }
 
 function mostrarSelecaoNivel(scene) {
-    let bg = scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.9).setDepth(20);
+    let bg = scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.95).setDepth(20);
     let txt = scene.add.text(200, 100, 'ESCOLHA O NÍVEL', { fontSize: '30px', color: '#fff' }).setOrigin(0.5).setDepth(30);
     let btnF = scene.add.text(200, 250, 'FÁCIL', { fontSize: '24px', backgroundColor: '#2ecc71', padding: 15 }).setOrigin(0.5).setDepth(30).setInteractive();
     let btnM = scene.add.text(200, 350, 'MÉDIO', { fontSize: '24px', backgroundColor: '#f1c40f', padding: 15 }).setOrigin(0.5).setDepth(30).setInteractive();
@@ -111,4 +106,38 @@ function iniciarJogo(scene, n, vel, bg, elementos) {
     bg.destroy(); elementos.forEach(e => e.destroy());
 }
 
-// ... (Funções restantes: update, perderVida, vitoria, gameOver, criarBotao mantêm-se iguais)
+function update() {
+    if (!gameStarted) return;
+    items.children.iterate((item) => {
+        if (item && item.y > 600) { item.destroy(); perderVida(this); }
+    });
+}
+
+function perderVida(scene) {
+    vidas--;
+    livesText.setText(`VIDAS: ${"❤️".repeat(vidas)}`);
+    if (vidas <= 0) gameOver(scene);
+}
+
+function vitoria(scene, msg) {
+    gameStarted = false; scene.physics.pause(); scene.sound.play('fogos');
+    scene.add.rectangle(200, 300, 400, 600, 0x000000, 0.8).setDepth(40);
+    scene.add.text(200, 300, msg, { fontSize: '25px', color: '#0f0', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5).setDepth(41);
+    scene.add.text(200, 450, 'REINICIAR', { backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setDepth(41).setInteractive().on('pointerdown', () => location.reload());
+}
+
+function gameOver(scene) {
+    gameStarted = false; scene.physics.pause();
+    scene.add.text(200, 300, 'GAME OVER', { fontSize: '40px', fill: '#f00' }).setOrigin(0.5).setDepth(40);
+    scene.add.text(200, 400, 'REINICIAR', { backgroundColor: '#fff', color: '#000', padding: 10 }).setOrigin(0.5).setDepth(40).setInteractive().on('pointerdown', () => location.reload());
+}
+
+function criarBotao(scene, x, y, texto, key) {
+    scene.add.text(x, y, texto, { backgroundColor: '#2c3e50', padding: 5 }).setOrigin(0.5).setInteractive().setDepth(15)
+        .on('pointerdown', () => {
+            estado.personagem = key;
+            player.setTexture(key);
+            fundo.setTexture(key === 'thor' ? 'fundoThor' : 'fundoMeninas');
+            if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
+        });
+}
