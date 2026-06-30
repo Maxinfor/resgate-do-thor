@@ -12,8 +12,8 @@ const game = new Phaser.Game(config);
 let player, items, scoreText, livesText, musica, latido, fundo;
 let gameStarted = false;
 let vidas = 3;
-let nivel = 'facil'; // Altere para 'medio' ou 'dificil'
-let dificuldade = (nivel === 'facil') ? 300 : (nivel === 'medio' ? 400 : 450);
+let nivel = ''; 
+let dificuldade = 300;
 let estado = { personagem: "helo", placar: { helo: 0, lis: 0, thor: 0 } };
 
 function preload() {
@@ -23,29 +23,15 @@ function preload() {
     this.load.image("helo", "helo.png");
     this.load.image("lis", "lis.png");
     this.load.image("thor", "thor.png");
-    this.load.image("agua", "agua.png");
-    this.load.image("carne", "carne.png");
-    this.load.image("osso", "osso.png");
-    this.load.image("secador", "secador.png");
-    this.load.image("escova", "escova.png");
-    this.load.image("oculos", "oculos.png");
-    this.load.image("tenis1", "tenis1.png");
-    this.load.image("tenis2", "tenis2.png");
-    this.load.image("amigos", "amigos.png");
-    this.load.image("agenda", "agenda.png");
-    this.load.image("caderno", "caderno.png");
-    this.load.image("estojo", "estojo.png");
-    this.load.image("garrafa", "garrafa.png");
-    this.load.image("kit", "kit.png");
-    this.load.image("lapis", "lapis.png");
-    this.load.image("livro", "livro.png");
-    this.load.image("mochila1", "mochila1.png");
-    this.load.image("mochila2", "mochila2.png");
-    this.load.image("mochila3", "mochila3.png");
-    this.load.image("lanche", "lanche.png");
-    this.load.audio("trilha", "musica.mp3");
-    this.load.audio("latido", "latido.mp3");
-    this.load.audio("fogos", "Fogo.mp3");
+    // Itens
+    this.load.image("agua", "agua.png"); this.load.image("carne", "carne.png"); this.load.image("osso", "osso.png");
+    this.load.image("secador", "secador.png"); this.load.image("escova", "escova.png"); this.load.image("oculos", "oculos.png");
+    this.load.image("tenis1", "tenis1.png"); this.load.image("tenis2", "tenis2.png"); this.load.image("amigos", "amigos.png");
+    this.load.image("agenda", "agenda.png"); this.load.image("caderno", "caderno.png"); this.load.image("estojo", "estojo.png");
+    this.load.image("garrafa", "garrafa.png"); this.load.image("kit", "kit.png"); this.load.image("lapis", "lapis.png");
+    this.load.image("livro", "livro.png"); this.load.image("mochila1", "mochila1.png"); this.load.image("mochila2", "mochila2.png");
+    this.load.image("mochila3", "mochila3.png"); this.load.image("lanche", "lanche.png");
+    this.load.audio("trilha", "musica.mp3"); this.load.audio("latido", "latido.mp3"); this.load.audio("fogos", "Fogo.mp3");
 }
 
 function create() {
@@ -67,7 +53,7 @@ function create() {
         scoreText.setText(`SCORE: ${score}`);
         item.destroy();
 
-        // Lógica de Dificuldade e Vitória
+        // Regras de Negócio por Nível
         if (nivel === 'facil' && score >= 500) vitoria(this, "PARABÉNS! VOCÊ VENCEU!");
         else if (nivel === 'medio') {
             if (score >= 500) dificuldade = 500;
@@ -95,6 +81,24 @@ function create() {
     criarBotao(this, 200, 550, 'Lis', 'lis');
     criarBotao(this, 300, 550, 'Thor', 'thor');
     criarCapa(this);
+}
+
+function criarCapa(scene) {
+    let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(20);
+    let txt = scene.add.text(200, 200, 'ESCOLHA O NÍVEL:', { fontSize: '24px', color: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(21);
+    
+    let btnF = scene.add.text(200, 280, 'FÁCIL', { backgroundColor: '#2ecc71', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
+    let btnM = scene.add.text(200, 360, 'MÉDIO', { backgroundColor: '#f1c40f', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
+    let btnD = scene.add.text(200, 440, 'DIFÍCIL', { backgroundColor: '#e74c3c', padding: 10 }).setOrigin(0.5).setDepth(21).setInteractive();
+
+    btnF.on('pointerup', () => iniciarJogo(scene, 'facil', 300, bg, [txt, btnF, btnM, btnD]));
+    btnM.on('pointerup', () => iniciarJogo(scene, 'medio', 400, bg, [txt, btnF, btnM, btnD]));
+    btnD.on('pointerup', () => iniciarJogo(scene, 'dificil', 450, bg, [txt, btnF, btnM, btnD]));
+}
+
+function iniciarJogo(scene, n, vel, bg, elementos) {
+    nivel = n; dificuldade = vel; gameStarted = true; musica.play();
+    bg.destroy(); elementos.forEach(e => e.destroy());
 }
 
 function update() {
@@ -133,10 +137,4 @@ function criarBotao(scene, x, y, texto, key) {
             fundo.setTexture(key === 'thor' ? 'fundoThor' : 'fundoMeninas');
             if (key === 'thor') { musica.stop(); latido.play(); setTimeout(() => musica.play(), 1500); }
         });
-}
-
-function criarCapa(scene) {
-    let bg = scene.add.image(200, 300, 'capa').setDisplaySize(400, 600).setDepth(20);
-    let btnJogar = scene.add.text(200, 450, 'JOGAR', { fontSize: '32px', backgroundColor: '#000', color: '#fff', padding: 15 }).setOrigin(0.5).setDepth(21).setInteractive();
-    btnJogar.on('pointerup', () => { gameStarted = true; musica.play(); bg.destroy(); btnJogar.destroy(); });
 }
