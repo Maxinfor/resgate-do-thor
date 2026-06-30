@@ -1,61 +1,572 @@
+ 
+    
+    //===================================================
+// AS AVENTURAS DE HELÔ, LIS E THOR
+// Versão 2.0 - Runner estilo Subway Surfers
+//===================================================
+
 const config = {
     type: Phaser.AUTO,
     width: 400,
     height: 600,
     pixelArt: true,
-    physics: { default: 'arcade', arcade: { debug: false } },
-    scene: { preload: preload, create: create, update: update }
+
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: false
+        }
+    },
+
+    scene: {
+        preload,
+        create,
+        update
+    }
 };
 
 const game = new Phaser.Game(config);
 
-let player, moldura, items, scoreText, livesText, musica, latido, fundo;
+//===========================
+// PISTAS
+//===========================
+
+const lanes = [100, 200, 300];
+let lane = 1;
+
+let pulando = false;
+
+//===========================
+// VELOCIDADE
+//===========================
+
+let velocidadeFundo = 8;
+let dificuldade = 320;
+
+//===========================
+// GAME
+//===========================
+
+let player;
+let moldura;
+let items;
+
+let scoreText;
+let livesText;
+
+let musica;
+let latido;
+
+let fundo1;
+let fundo2;
+
 let gameStarted = false;
 let vidas = 3;
-let dificuldade = 300; 
-let estado = { personagem: 'helo', placar: { helo: 0, lis: 0, thor: 0 } };
 
-function preload() {
-    this.load.image('capa', 'capa.jpg');
-    this.load.image('fundoThor', 'casa.jpg');
-    this.load.image('fundoMeninas', 'quarto.jpg');
-    
-    // Ajuste de extensões conforme sua lista atualizada
-    this.load.image('helo', 'helo.png'); 
-    this.load.image('lis', 'lis.png');
-    this.load.image('thor', 'thor.png');
-    
-    this.load.image('agua', 'agua.png'); 
-    this.load.image('carne', 'carne.png');
-    this.load.image('osso', 'osso.png');
-    this.load.image('secador', 'secador.png');
-    this.load.image('escova', 'escova.png');
-    this.load.image('oculos', 'oculos.png'); 
-    this.load.image('tenis1', 'tenis1.png');
-    this.load.image('tenis2', 'tenis2.png');
-    this.load.image('amigos', 'amigos.png');
-    this.load.image('agenda', 'agenda.png');
-    this.load.image('caderno', 'caderno.png');
-    this.load.image('estojo', 'estojo.png');
-    this.load.image('garrafa', 'garrafa.png');
-    this.load.image('kit', 'kit.png');
-    this.load.image('lapis', 'lapis.png');
-    this.load.image('livro', 'livro.png');
-    this.load.image('mochila1', 'mochila1.png');
-    this.load.image('mochila2', 'mochila2.png');
-    this.load.image('mochila3', 'mochila3.png');
-    this.load.image('lanche', 'lanche.png');
-    
-    this.load.audio('trilha', 'musica.mp3'); 
-    this.load.audio('latido', 'latido.mp3');
-    this.load.audio('fogos', 'Fogo.mp3');
+//===========================
+// ESTADO
+//===========================
+
+let estado = {
+
+    personagem: "helo",
+
+    placar: {
+        helo: 0,
+        lis: 0,
+        thor: 0
+    }
+
+};
+
+//===========================
+// PRELOAD
+//===========================
+
+function preload(){
+
+    this.load.image("capa","capa.jpg");
+
+    this.load.image("fundoThor","casa.jpg");
+    this.load.image("fundoMeninas","quarto.jpg");
+
+    this.load.image("helo","helo.png");
+    this.load.image("lis","lis.png");
+    this.load.image("thor","thor.png");
+
+    //=====================
+    // ITENS
+    //=====================
+
+    this.load.image("agua","agua.png");
+    this.load.image("carne","carne.png");
+    this.load.image("osso","osso.png");
+    this.load.image("secador","secador.png");
+    this.load.image("escova","escova.png");
+    this.load.image("oculos","oculos.png");
+
+    this.load.image("tenis1","tenis1.png");
+    this.load.image("tenis2","tenis2.png");
+
+    this.load.image("amigos","amigos.png");
+    this.load.image("agenda","agenda.png");
+    this.load.image("caderno","caderno.png");
+    this.load.image("estojo","estojo.png");
+    this.load.image("garrafa","garrafa.png");
+    this.load.image("kit","kit.png");
+    this.load.image("lapis","lapis.png");
+    this.load.image("livro","livro.png");
+
+    this.load.image("mochila1","mochila1.png");
+    this.load.image("mochila2","mochila2.png");
+    this.load.image("mochila3","mochila3.png");
+
+    this.load.image("lanche","lanche.png");
+
+    // NOVO
+    this.load.image("moeda","moeda.png");
+
+    //=====================
+    // OBSTÁCULOS
+    //=====================
+
+    this.load.image("urso","urso.png");
+    this.load.image("leao","leao.png");
+    this.load.image("onca","onca.png");
+
+    //=====================
+    // AUDIO
+    //=====================
+
+    this.load.audio("trilha","musica.mp3");
+    this.load.audio("latido","latido.mp3");
+    this.load.audio("fogos","Fogo.mp3");
+
 }
 
-function create() {
-    fundo = this.add.image(200, 300, 'fundoMeninas').setDisplaySize(400, 600).setDepth(0);
-    this.add.rectangle(200, 300, 400, 600, 0x000000, 0.2).setDepth(1);
+//===========================
+// CREATE
+//===========================
 
-    musica = this.sound.add('trilha', { loop: true, volume: 0.3 });
+function create(){
+
+    //-----------------------------------
+    // Fundo infinito
+    //-----------------------------------
+
+    fundo1 = this.add.image(
+        200,
+        300,
+        "fundoMeninas"
+    ).setDisplaySize(400,600);
+
+    fundo2 = this.add.image(
+        200,
+        -300,
+        "fundoMeninas"
+    ).setDisplaySize(400,600);
+
+    this.add.rectangle(
+        200,
+        300,
+        400,
+        600,
+        0x000000,
+        0.15
+    );
+
+    //-----------------------------------
+    // Sons
+    //-----------------------------------
+
+    musica = this.sound.add("trilha",{
+        loop:true,
+        volume:0.35
+    });
+
+    latido = this.sound.add("latido",{
+        volume:0.6
+    });
+
+    //-----------------------------------
+    // Grupo
+    //-----------------------------------
+
+    items = this.physics.add.group();
+
+    //-----------------------------------
+    // HUD
+    //-----------------------------------
+
+    scoreText = this.add.text(
+
+        15,
+        15,
+
+        "SCORE: 0",
+
+        {
+            fontSize:"24px",
+            fill:"#ffffff",
+            fontStyle:"bold"
+        }
+
+    );
+
+    livesText = this.add.text(
+
+        385,
+        15,
+
+        "VIDAS: ❤️❤️❤️",
+
+        {
+            fontSize:"20px",
+            fill:"#ff4444"
+        }
+
+    ).setOrigin(1,0);
+
+    //-----------------------------------
+    // Personagem
+    //-----------------------------------
+
+    player = this.physics.add.sprite(
+
+        lanes[lane],
+        450,
+
+        estado.personagem
+
+    );
+
+    player.setDisplaySize(100,90);
+
+    player.setCollideWorldBounds(true);
+
+    //-----------------------------------
+    // Moldura
+    //-----------------------------------
+
+    moldura = this.add.ellipse(
+
+        lanes[lane],
+        455,
+
+        110,
+        90,
+
+        0xffffff
+
+    );
+
+    moldura.setStrokeStyle(
+        4,
+        0x000000
+    );
+
+    //-----------------------------------
+    // Colisão
+    //-----------------------------------
+
+    this.physics.add.overlap(
+
+        player,
+
+        items,
+
+        (player,item)=>{
+
+            //--------------------------------
+
+            if(item.tipo=="obstaculo"){
+
+                item.destroy();
+
+                perderVida(this);
+
+                return;
+
+            }
+
+            //--------------------------------
+            // Moedas
+            //--------------------------------
+
+            if(item.texture.key=="moeda"){
+
+                estado.placar[
+                    estado.personagem
+                ] += 5;
+
+            }
+
+            //--------------------------------
+            // Itens dourados
+            //--------------------------------
+
+            else{
+
+                let pontos =
+                    item.isGold ? 60 : 10;
+
+                estado.placar[
+                    estado.personagem
+                ] += pontos;
+
+            }
+
+            //--------------------------------
+
+            scoreText.setText(
+
+                "SCORE: " +
+
+                estado.placar[
+                    estado.personagem
+                ]
+
+            );
+
+            //--------------------------------
+            // aumenta dificuldade
+            //--------------------------------
+
+            velocidadeFundo += 0.03;
+
+            dificuldade += 1;
+
+            //--------------------------------
+
+            item.destroy();
+
+        }
+
+    );
+
+    //-----------------------------------
+    // TECLADO
+    //-----------------------------------
+
+    this.input.keyboard.on(
+
+        "keydown-LEFT",
+
+        ()=>{
+
+            if(lane>0){
+
+                lane--;
+
+                this.tweens.add({
+
+                    targets:player,
+
+                    x:lanes[lane],
+
+                    duration:120
+
+                });
+
+            }
+
+        }
+
+    );
+
+    //-----------------------------------
+
+    this.input.keyboard.on(
+
+        "keydown-RIGHT",
+
+        ()=>{
+
+            if(lane<2){
+
+                lane++;
+
+                this.tweens.add({
+
+                    targets:player,
+
+                    x:lanes[lane],
+
+                    duration:120
+
+                });
+
+            }
+
+        }
+
+    );
+
+    //-----------------------------------
+
+    this.input.keyboard.on(
+
+        "keydown-UP",
+
+        ()=>{
+
+            if(!pulando){
+
+                pulando=true;
+
+                this.tweens.add({
+
+                    targets:player,
+
+                    y:340,
+
+                    duration:220,
+
+                    yoyo:true,
+
+                    onComplete:()=>{
+
+                        pulando=false;
+
+                    }
+
+                });
+
+            }
+
+        }
+
+    );
+
+    //-----------------------------------
+    // Spawn
+    //-----------------------------------
+
+    this.time.addEvent({
+
+        delay:700,
+
+        loop:true,
+
+        callback:()=>{
+
+            if(!gameStarted) return;
+
+            if(items.countActive()>12) return;
+
+            let obstaculos=[
+                "urso",
+                "leao",
+                "onca"
+            ];
+
+            let premios=[
+
+                "moeda",
+
+                "livro",
+
+                "agenda",
+
+                "caderno",
+
+                "garrafa",
+
+                "lanche",
+
+                "tenis1",
+
+                "tenis2",
+
+                "mochila1",
+
+                "mochila2",
+
+                "mochila3"
+
+            ];
+
+            let criarObstaculo=
+                Phaser.Math.Between(1,4)==1;
+
+            let sprite;
+
+            if(criarObstaculo){
+
+                sprite=items.create(
+
+                    lanes[
+                        Phaser.Math.Between(0,2)
+                    ],
+
+                    -80,
+
+                    obstaculos[
+                        Phaser.Math.Between(0,2)
+                    ]
+
+                );
+
+                sprite.tipo="obstaculo";
+
+                sprite.setDisplaySize(120,120);
+
+            }
+
+            else{
+
+                sprite=items.create(
+
+                    lanes[
+                        Phaser.Math.Between(0,2)
+                    ],
+
+                    -80,
+
+                    premios[
+                        Phaser.Math.Between(
+                            0,
+                            premios.length-1
+                        )
+                    ]
+
+                );
+
+                sprite.tipo="premio";
+
+                sprite.isGold=
+                    Phaser.Math.Between(1,10)==1;
+
+                sprite.setDisplaySize(70,70);
+
+                if(sprite.isGold){
+
+                    sprite.setTint(0xFFD700);
+
+                }
+
+            }
+
+            sprite.setVelocityY(dificuldade);
+
+        }
+
+    });
+
+    //-----------------------------------
+    // Botões
+    //-----------------------------------
+
+    criarBotao(this,100,550,"Helô","helo");
+    criarBotao(this,200,550,"Lis","lis");
+    criarBotao(this,300,550,"Thor","thor");
+
+    //-----------------------------------
+
+    criarCapa(this);
+
+}
+    
     latido = this.sound.add('latido', { volume: 0.5 });
     items = this.physics.add.group();
     
